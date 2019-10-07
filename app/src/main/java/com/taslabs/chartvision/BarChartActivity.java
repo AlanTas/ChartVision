@@ -9,6 +9,7 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,16 +31,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import com.taslabs.chartvision.JsonParser;
+
 public class BarChartActivity extends AppCompatActivity {
     TextToSpeech textToSpeech;
-
+    BarChart chart;
+    BarChartObj chartData;
+    TextView titulo;
+    TextView xlabel;
+    TextView ylabel;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bar_chart);
-        BarChart chart = findViewById(R.id.barchart);
+        chart = findViewById(R.id.barchart);
+
+        titulo = findViewById(R.id.title);
+        xlabel = findViewById(R.id.xlabel);
+        ylabel = findViewById(R.id.ylabel);
 
         textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
@@ -58,26 +69,44 @@ public class BarChartActivity extends AppCompatActivity {
             }
         });
 
+        JsonParser jsonParser = new JsonParser();
+        jsonParser.loadJSONFromAsset(this);
+        chartData = jsonParser.getBarChartObj();
+        starListeners();
+        stpChart();
+
+    }
+
+
+    public void stpChart(){
+
+        titulo.setText(chartData.getTitle());
+        xlabel.setText(chartData.getxLabel());
+        ylabel.setText(chartData.getyLabel());
+
+        // Get values from object
         List<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(0f, 30f, "Banana"));
-        entries.add(new BarEntry(1f, 80f));
-        entries.add(new BarEntry(2f, 60f));
-        entries.add(new BarEntry(3f, 50f));
-        // gap of 2f
-        entries.add(new BarEntry(5f, 70f));
-        entries.add(new BarEntry(6f, 60f));
+        int lenght = chartData.getLabels().length;
+
+        for(int i = 0; i < lenght; i++){
+            entries.add(new BarEntry((float)i, (float)chartData.getValues()[i]));
+
+        }
+
         BarDataSet set = new BarDataSet(entries, "BarDataSet");
-
-
         BarData data = new BarData(set);
-        data.setBarWidth(0.9f); // set custom bar width
         chart.setData(data);
+
+
+        //data.setBarWidth(0.9f); // set custom bar width
+
         chart.setFitBars(true); // make the x-axis fit exactly all bars
         chart.invalidate(); // refresh
         chart.setDoubleTapToZoomEnabled(false);
         chart.setPinchZoom(false);
-        String[] labels = {"aaaaa", "bbbbbb", "cccccc", "dddddd", "eeeeee", "fffffff", "gggggg", "hhhhhh"};
+        String[] labels = chartData.getLabels();
         chart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
+        chart.getXAxis().setLabelCount(lenght);
 
         chart.getAxisLeft().setDrawGridLines(false);
         chart.getXAxis().setDrawGridLines(false);
@@ -118,6 +147,7 @@ public class BarChartActivity extends AppCompatActivity {
 
             }
         });
+
     }
 
 
@@ -128,13 +158,10 @@ public class BarChartActivity extends AppCompatActivity {
         else {
             textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null);
         }
+    }
+
+    public void starListeners(){
 
     }
 
-    private void convertTextToSpeech() {
-
-        String text = "Hello World";
-
-        textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-    }
 }

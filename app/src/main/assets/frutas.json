@@ -1,0 +1,43 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+    "data": {
+        "values": [
+            {
+                "Frutas": "Banana",
+                "Quantidade": 5
+            },
+            {
+                "Frutas": "Laranja",
+                "Quantidade": 3
+            },
+            {
+                "Frutas": "Ma\u00e7\u00e3",
+                "Quantidade": 7
+            },
+            {
+                "Frutas": "Ameixa",
+                "Quantidade": 12
+            },
+            {
+                "Frutas": "Acerola",
+                "Quantidade": 9
+            },
+            {
+                "Frutas": "Figo",
+                "Quantidade": 2
+            }
+        ]
+    },
+    "title": "Frutas Consumidas na Semana",
+    "mark": "bar",
+    "encoding": {
+        "x": {
+            "field": "Frutas",
+            "type": "ordinal"
+        },
+        "y": {
+            "field": "Quantidade",
+            "type": "quantitative"
+        }
+    }
+}

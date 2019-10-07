@@ -1,0 +1,67 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+    "data": {
+        "values": [
+            {
+                "M\u00eas": "Jan",
+                "Quantia em Reais": 400
+            },
+            {
+                "M\u00eas": "Fev",
+                "Quantia em Reais": 512
+            },
+            {
+                "M\u00eas": "Mar",
+                "Quantia em Reais": 654
+            },
+            {
+                "M\u00eas": "Abr",
+                "Quantia em Reais": 352
+            },
+            {
+                "M\u00eas": "Mai",
+                "Quantia em Reais": 452
+            },
+            {
+                "M\u00eas": "Jun",
+                "Quantia em Reais": 658
+            },
+            {
+                "M\u00eas": "Jul",
+                "Quantia em Reais": 845
+            },
+            {
+                "M\u00eas": "Ago",
+                "Quantia em Reais": 654
+            },
+            {
+                "M\u00eas": "Set",
+                "Quantia em Reais": 486
+            },
+            {
+                "M\u00eas": "Out",
+                "Quantia em Reais": 634
+            },
+            {
+                "M\u00eas": "Nov",
+                "Quantia em Reais": 486
+            },
+            {
+                "M\u00eas": "Dez",
+                "Quantia em Reais": 664
+            }
+        ]
+    },
+    "title": "Faturamento mensal de 2018",
+    "mark": "bar",
+    "encoding": {
+        "x": {
+            "field": "M\u00eas",
+            "type": "ordinal"
+        },
+        "y": {
+            "field": "Quantia em Reais",
+            "type": "quantitative"
+        }
+    }
+}
