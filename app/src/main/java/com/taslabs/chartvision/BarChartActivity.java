@@ -70,10 +70,16 @@ public class BarChartActivity extends AppCompatActivity {
         });
 
         JsonParser jsonParser = new JsonParser();
-        jsonParser.loadJSONFromAsset(this);
+        jsonParser.loadJSONFromURL("https://alantas.dev/jsons/fatmen.json");
         chartData = jsonParser.getBarChartObj();
         starListeners();
         stpChart();
+
+
+//        jsonParser.loadJSONFromAsset(this);
+//        chartData = jsonParser.getBarChartObj();
+//        starListeners();
+//        stpChart();
 
     }
 
