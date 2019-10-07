@@ -40,6 +40,7 @@ public class BarChartActivity extends AppCompatActivity {
     TextView titulo;
     TextView xlabel;
     TextView ylabel;
+    String url = null;
 
 
     @Override
@@ -69,8 +70,13 @@ public class BarChartActivity extends AppCompatActivity {
             }
         });
 
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            url = extras.getString("url");
+        }
+
         JsonParser jsonParser = new JsonParser();
-        jsonParser.loadJSONFromURL("https://alantas.dev/jsons/fatmen.json");
+        jsonParser.loadJSONFromURL(url);
         chartData = jsonParser.getBarChartObj();
         starListeners();
         stpChart();

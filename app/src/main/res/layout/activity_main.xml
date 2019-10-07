@@ -17,4 +17,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/btnQR"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="QR DEMO"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnBarChart"
+        app:layout_constraintVertical_bias="0.051" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
