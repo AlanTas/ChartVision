@@ -7,6 +7,7 @@ import com.taslabs.chartvision.enums.FontSize;
 import com.taslabs.chartvision.interfaces.IUser;
 import com.taslabs.chartvision.interfaces.IUserManager;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,10 +19,11 @@ import java.util.function.BiConsumer;
 public class UserManager implements IUserManager {
 
 
-    private static  UserManager userManagerInstance;
+    private static UserManager userManagerInstance;
     private final Context mContext;
     private final SharedPreferences mSharedPref;
-    private List<IUser> mUsers;
+    private List<IUser> mUsers = new ArrayList<>();
+    private final int userLimit = 5;
 
     public static final String KEY_USERS = "usuarios";
 
@@ -37,7 +39,7 @@ public class UserManager implements IUserManager {
         }
     }
 
-    public UserManager getInstance(Context c) {
+    public static synchronized UserManager getInstance(Context c) {
         if (userManagerInstance==null)
             userManagerInstance = new UserManager(c);
         return userManagerInstance;
@@ -55,7 +57,7 @@ public class UserManager implements IUserManager {
 
     @Override
     public void SaveUser(IUser user) {
-        if (!user.validadeUser()) return;
+        if (!user.validadeUser()||mUsers.size()==userLimit) return;
         String users = mSharedPref.getString(KEY_USERS,"");
        if (mUsers.size() > 1) {
           users += ",";
