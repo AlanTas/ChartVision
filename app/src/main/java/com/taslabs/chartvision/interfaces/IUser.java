@@ -2,6 +2,8 @@ package com.taslabs.chartvision.interfaces;
 
 import com.taslabs.chartvision.enums.FontSize;
 
+import java.util.HashMap;
+
 public interface IUser {
 
     //String Name
@@ -22,9 +24,13 @@ public interface IUser {
 
      boolean isAudioEnabled();
 
-     void SetVibrationEnabled(boolean enabled);
+     void setVibrationEnabled(boolean enabled);
 
      boolean isVibrationEnabled();
+
+     boolean validadeUser();
+
+     HashMap<String,String> getUserData();
 
 
 
