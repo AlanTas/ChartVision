@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent I = new Intent(MainActivity.this, BarChartActivity.class);
+                I.putExtra("url", "https://alantas.dev/jsons/frutas.json");
                 startActivity(I);
             }
         });
