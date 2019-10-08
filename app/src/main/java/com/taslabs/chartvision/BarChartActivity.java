@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -41,6 +42,7 @@ public class BarChartActivity extends AppCompatActivity {
     TextView titulo;
     TextView xlabel;
     TextView ylabel;
+    ConstraintLayout constraintLayout;
     String url = null;
 
     // in View Bounds variables
@@ -52,7 +54,8 @@ public class BarChartActivity extends AppCompatActivity {
     boolean lastTitulo = false;
     boolean lastY = false;
     boolean lastX = false;
-    Highlight lastHighlight = null;
+    boolean first = true;
+    Highlight lastHighlight;
 
 
     @Override
@@ -64,6 +67,7 @@ public class BarChartActivity extends AppCompatActivity {
         titulo = findViewById(R.id.title);
         xlabel = findViewById(R.id.xlabel);
         ylabel = findViewById(R.id.ylabel);
+        constraintLayout = findViewById(R.id.layout);
 
         textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
@@ -261,10 +265,15 @@ public class BarChartActivity extends AppCompatActivity {
                         MotionEvent newTouch = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), MotionEvent.ACTION_DOWN,
                                 event.getRawX(), event.getRawY(), event.getMetaState());
                         Highlight highlight = chart.getHighlightByTouchPoint(event.getRawX() - chart.getLeft(), event.getRawY() - chart.getTop());
-                        if(highlight != lastHighlight) {
-                            lastHighlight = highlight;
-                            //chart.highlightValue(highlight, true);
+
+                        if(!first) {
+                            if (!highlight.equalTo(lastHighlight)) {
+                                lastHighlight = highlight;
+                                chart.highlightValue(highlight, true);
+                            }
                         }
+                        lastHighlight = highlight;
+                        first = false;
                     }
 
                     // Se for arrastado para o Titulo
@@ -326,7 +335,15 @@ public class BarChartActivity extends AppCompatActivity {
                         MotionEvent newTouch = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), MotionEvent.ACTION_DOWN,
                                 event.getRawX(), event.getRawY(), event.getMetaState());
                         Highlight highlight = chart.getHighlightByTouchPoint(event.getRawX() - chart.getLeft(), event.getRawY() - chart.getTop());
-                        chart.highlightValue(highlight, true);
+
+                        if(!first) {
+                            if (!highlight.equalTo(lastHighlight)) {
+                                lastHighlight = highlight;
+                                chart.highlightValue(highlight, true);
+                            }
+                        }
+                        lastHighlight = highlight;
+                        first = false;
                     }
 
                     // Se for arrastado para o Titulo
@@ -359,7 +376,7 @@ public class BarChartActivity extends AppCompatActivity {
 
                 }
 
-                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN && x < leftBound) {
                     lastY = true;
                     lastX = false;
                     lastTitulo = false;
@@ -379,7 +396,7 @@ public class BarChartActivity extends AppCompatActivity {
 
                 int leftBound = chart.getLeft();
                 int upperBound = chart.getTop();
-                int downerBound = chart.getBottom();
+                int downerBound = chart.getBottom() + (chart.getBottom()/12);
 
                 System.out.println("X Y da outra: " + event.getRawX() + " " + event.getRawY());
                 if(event.getAction() == MotionEvent.ACTION_MOVE) {
@@ -388,7 +405,15 @@ public class BarChartActivity extends AppCompatActivity {
                         MotionEvent newTouch = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), MotionEvent.ACTION_DOWN,
                                 event.getRawX(), event.getRawY(), event.getMetaState());
                         Highlight highlight = chart.getHighlightByTouchPoint(event.getRawX() - chart.getLeft(), event.getRawY() - chart.getTop());
-                        chart.highlightValue(highlight, true);
+
+                        if(!first) {
+                            if (!highlight.equalTo(lastHighlight)) {
+                                lastHighlight = highlight;
+                                chart.highlightValue(highlight, true);
+                            }
+                        }
+                        lastHighlight = highlight;
+                        first = false;
                     }
 
                     // Se for arrastado para o Titulo
@@ -426,6 +451,7 @@ public class BarChartActivity extends AppCompatActivity {
                     lastY = false;
                     lastTitulo = false;
                     tts(xlabel.getText().toString());
+                    System.out.println("FOI DO X LABEL");
                     //Here goes code to execute on onTouch ViewA
                 }
 
@@ -434,6 +460,101 @@ public class BarChartActivity extends AppCompatActivity {
         });
 
 
+        constraintLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+
+                int x = (int)event.getRawX();
+                int y = (int)event.getRawY();
+
+                int leftBound = chart.getLeft();
+                int upperBound = chart.getTop();
+                int downerBound = chart.getBottom() + (chart.getBottom()/12);
+
+                System.out.println("X Y da outra: " + event.getRawX() + " " + event.getRawY());
+                if(event.getAction() == MotionEvent.ACTION_MOVE) {
+                    if(isViewInBounds(chart, x, y)) {
+
+                        MotionEvent newTouch = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), MotionEvent.ACTION_DOWN,
+                                event.getRawX(), event.getRawY(), event.getMetaState());
+                        Highlight highlight = chart.getHighlightByTouchPoint(event.getRawX() - chart.getLeft(), event.getRawY() - chart.getTop());
+
+                        if(!first) {
+                            if (!highlight.equalTo(lastHighlight)) {
+                                lastHighlight = highlight;
+                                chart.highlightValue(highlight, true);
+                            }
+                        }
+                        lastHighlight = highlight;
+                        first = false;
+                    }
+
+                    // Se for arrastado para o Titulo
+                    if(y < upperBound && !lastTitulo) {
+                        lastTitulo = true;
+                        lastX = false;
+                        lastY = false;
+                        tts(titulo.getText().toString());
+
+                        Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
+                    }
+
+                    // Se for arrastado para o LabelX
+                    if(y > downerBound && !lastX){
+                        lastX = true;
+                        lastY = false;
+                        lastTitulo = false;
+                        tts(xlabel.getText().toString());
+                        //Here goes code to execute on onTouch ViewA
+                    }
+
+                    // Se for arrastado para o labelY
+                    if((x < leftBound) && !lastY){
+                        lastY = true;
+                        lastX = false;
+                        lastTitulo = false;
+                        tts(ylabel.getText().toString());
+                        //Here goes code to execute on onTouch ViewA
+                    }
+
+                }
+
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+
+                    // Se for arrastado para o Titulo
+                    if(y < upperBound) {
+                        lastTitulo = true;
+                        lastX = false;
+                        lastY = false;
+                        tts(titulo.getText().toString());
+
+                        Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
+                    }
+
+                    // Se for arrastado para o LabelX
+                    if(y > downerBound){
+                        lastX = true;
+                        lastY = false;
+                        lastTitulo = false;
+                        tts(xlabel.getText().toString());
+                        //Here goes code to execute on onTouch ViewA
+                    }
+
+                    // Se for arrastado para o labelY
+                    if((x < leftBound)){
+                        lastY = true;
+                        lastX = false;
+                        lastTitulo = false;
+                        tts(ylabel.getText().toString());
+                        //Here goes code to execute on onTouch ViewA
+                    }
+
+                }
+
+                return true;
+            }
+        });
 
     }
 
