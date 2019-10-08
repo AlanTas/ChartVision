@@ -5,5 +5,5 @@ import java.util.List;
 public interface IUserManager {
 
    void SaveUser(IUser user);
-   void getUsers(List<IUser> users);
+   List<IUser> getUsers();
 }

@@ -3,6 +3,8 @@ package com.taslabs.chartvision.userManager;
 import com.taslabs.chartvision.enums.FontSize;
 import com.taslabs.chartvision.interfaces.IUser;
 
+import java.util.HashMap;
+
 public class User implements IUser {
 
 
@@ -49,12 +51,26 @@ public class User implements IUser {
     }
 
     @Override
-    public void SetVibrationEnabled(boolean enabled) {
+    public void setVibrationEnabled(boolean enabled) {
         mVibrationEnabled = enabled;
     }
 
     @Override
     public boolean isVibrationEnabled() {
         return mVibrationEnabled;
+    }
+
+    @Override
+    public boolean validadeUser() {
+        return true;
+    }
+
+    @Override
+    public HashMap<String, String> getUserData() {
+        HashMap<String,String> dados = new HashMap<>();
+        dados.put(KEY_FONT_SIZE,getFontSize().toString());
+        dados.put(KEY_AUDIO, String.valueOf(isAudioEnabled()));
+        dados.put(KEY_VIBRATION, String.valueOf(isVibrationEnabled()));
+        return dados;
     }
 }
