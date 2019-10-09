@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.github.mikephil.charting.charts.BarChart;
 
 public class MainActivity extends AppCompatActivity {
-    Button btnBarChart, btnQR;
+    Button btnBarChart, btnQR, btnNFC;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +33,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent I = new Intent(MainActivity.this, QRScanActivity.class);
+                startActivity(I);
+            }
+        });
+
+        btnNFC = findViewById(R.id.btnNFC);
+        btnNFC.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent I = new Intent(MainActivity.this, NFCActivity.class);
                 startActivity(I);
             }
         });

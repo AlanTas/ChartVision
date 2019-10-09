@@ -29,4 +29,14 @@
         app:layout_constraintTop_toBottomOf="@+id/btnBarChart"
         app:layout_constraintVertical_bias="0.051" />
 
+    <Button
+        android:id="@+id/btnNFC"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="NFC DEMO"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnQR" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
