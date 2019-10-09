@@ -1,4 +1,5 @@
 package com.taslabs.chartvision;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Build;
@@ -24,6 +25,7 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.highlight.ChartHighlighter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
@@ -36,6 +38,11 @@ import java.util.Locale;
 import com.taslabs.chartvision.JsonParser;
 
 public class BarChartActivity extends AppCompatActivity {
+    // global variables
+    protected static Entry entra;
+    protected static int index;
+    protected static Highlight higha;
+
     TextToSpeech textToSpeech;
     BarChart chart;
     BarChartObj chartData;
@@ -55,6 +62,7 @@ public class BarChartActivity extends AppCompatActivity {
     boolean lastY = false;
     boolean lastX = false;
     boolean first = true;
+    boolean isInside = true;
     Highlight lastHighlight;
 
 
@@ -138,11 +146,12 @@ public class BarChartActivity extends AppCompatActivity {
 
         chart.getAxisLeft().setDrawGridLines(false);
         chart.getXAxis().setDrawGridLines(false);
+        chart.getLegend().setEnabled(false); //Desabilita a legenda
 
         chart.getAxisLeft().setDrawGridLines(false);
         chart.getAxisRight().setDrawGridLines(false);
         chart.getXAxis().setDrawGridLines(false);
-        chart.getDescription().setText("Description of my chart");
+        chart.getDescription().setEnabled(false);
 
         XAxis xAxis = chart.getXAxis();
 
@@ -151,88 +160,6 @@ public class BarChartActivity extends AppCompatActivity {
 
         YAxis rightYAxis = chart.getAxisRight();
         rightYAxis.setEnabled(false);
-
-        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
-            @Override
-            public void onValueSelected(Entry entry, Highlight h) {
-
-                System.out.println("RESETOU");
-                lastTitulo = false;
-                lastX = false;
-                lastY = false;
-
-
-                Long entryX = (long) entry.getY();
-                Toast.makeText(getApplicationContext(), String.valueOf(entryX), Toast.LENGTH_LONG).show();
-
-                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                // Vibrate for 500 milliseconds
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
-                } else {
-                    //deprecated in API 26
-                    v.vibrate(100);
-                }
-
-                tts(String.valueOf(entryX));
-            }
-
-            @Override
-            public void onNothingSelected() {
-
-            }
-        });
-//        chart.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                System.out.println("CHAMOU CHAMOU CHAMOU");
-//            }
-//        });
-        chart.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                int x = (int)event.getRawX();
-                int y = (int)event.getRawY();
-                System.out.println("X - " + x);
-                System.out.println("Y - " + y);
-                int leftBound = v.getLeft();
-                int upperBound = v.getTop();
-                int downerBound = v.getBottom();
-                if(event.getAction() == MotionEvent.ACTION_MOVE){
-
-                    // Se for arrastado para o Titulo
-                    if(y < upperBound && !lastTitulo) {
-                        lastTitulo = true;
-                        lastX = false;
-                        lastY = false;
-                        tts(titulo.getText().toString());
-
-                        Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
-                    }
-
-                    // Se for arrastado para o LabelX
-                    if(y > downerBound && !lastX){
-                        lastX = true;
-                        lastY = false;
-                        lastTitulo = false;
-                        tts(xlabel.getText().toString());
-                        //Here goes code to execute on onTouch ViewA
-                    }
-
-                    // Se for arrastado para o labelY
-                    if((x < leftBound) && !lastY){
-                        lastY = true;
-                        lastX = false;
-                        lastTitulo = false;
-                        tts(ylabel.getText().toString());
-                        //Here goes code to execute on onTouch ViewA
-                    }
-
-                }
-                // Further touch is not handled
-                return false;
-            }
-        });
 
     }
 
@@ -245,7 +172,110 @@ public class BarChartActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     public void startListeners(){
+
+
+        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry entry, Highlight h) {
+                entra = entry;
+                higha = h;
+
+
+                if (isInside) {
+                    System.out.println("RESETOU");
+                    lastTitulo = false;
+                    lastX = false;
+                    lastY = false;
+
+
+                    Long entryX = (long) entry.getY();
+                    Toast.makeText(getApplicationContext(), String.valueOf(entryX), Toast.LENGTH_LONG).show();
+
+                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    // Vibrate for 500 milliseconds
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
+                    } else {
+                        //deprecated in API 26
+                        v.vibrate(100);
+                    }
+
+                    tts(String.valueOf(entryX));
+                }
+
+                else{
+                    chart.highlightValue(0f, 0f, -1);
+                }
+            }
+
+            @Override
+            public void onNothingSelected() {
+
+            }
+        });
+
+        chart.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int x = (int)event.getRawX();
+                int y = (int)event.getRawY();
+                System.out.println("X - " + x);
+                System.out.println("Y - " + y);
+                int leftBound = v.getLeft();
+                int upperBound = v.getTop();
+                int downerBound = v.getBottom() + (v.getBottom()/12);
+                if(event.getAction() == MotionEvent.ACTION_MOVE){
+
+                    // Se for arrastado para o Titulo
+                    if(y < upperBound && !lastTitulo) {
+                        isInside = false;
+                        lastTitulo = true;
+                        lastX = false;
+                        lastY = false;
+                        tts(titulo.getText().toString());
+                        chart.highlightValues(null);
+
+                    }
+
+                    // Se for arrastado para o LabelX
+                    if(y > downerBound && !lastX){
+                        isInside = false;
+                        lastX = true;
+                        lastY = false;
+                        lastTitulo = false;
+                        tts(xlabel.getText().toString());
+                        chart.highlightValues(null);
+                        //Here goes code to execute on onTouch ViewA
+                    }
+
+                    // Se for arrastado para o labelY
+                    if((x < leftBound) && !lastY){
+                        isInside = false;
+                        lastY = true;
+                        lastX = false;
+                        lastTitulo = false;
+                        tts(ylabel.getText().toString());
+                        chart.highlightValues(null);
+                        //Here goes code to execute on onTouch ViewA
+                    }
+
+                    if (isViewInBounds(chart, x, y)){
+                        isInside = true;
+                    }
+
+
+                }
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+
+                isInside = true;
+                }
+                // Further touch is not handled
+                return false;
+            }
+        });
+
 
         titulo.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -258,26 +288,31 @@ public class BarChartActivity extends AppCompatActivity {
                 int upperBound = chart.getTop();
                 int downerBound = chart.getBottom();
 
-                System.out.println("X Y da outra: " + event.getRawX() + " " + event.getRawY());
+                System.out.println("TITULO: X Y da outra: " + event.getRawX() + " " + event.getRawY());
                 if(event.getAction() == MotionEvent.ACTION_MOVE) {
                     if(isViewInBounds(chart, x, y)) {
-
+                        isInside = true;
                         MotionEvent newTouch = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), MotionEvent.ACTION_DOWN,
                                 event.getRawX(), event.getRawY(), event.getMetaState());
                         Highlight highlight = chart.getHighlightByTouchPoint(event.getRawX() - chart.getLeft(), event.getRawY() - chart.getTop());
 
-                        if(!first) {
                             if (!highlight.equalTo(lastHighlight)) {
                                 lastHighlight = highlight;
                                 chart.highlightValue(highlight, true);
                             }
-                        }
+
                         lastHighlight = highlight;
                         first = false;
+                        lastTitulo = false;
+                        lastY = false;
+                        lastX = false;
                     }
 
                     // Se for arrastado para o Titulo
                     if(y < upperBound && !lastTitulo) {
+                        lastHighlight = null;
+                        isInside = false;
+                        chart.highlightValues(null);
                         lastTitulo = true;
                         lastX = false;
                         lastY = false;
@@ -288,6 +323,8 @@ public class BarChartActivity extends AppCompatActivity {
 
                     // Se for arrastado para o LabelX
                     if(y > downerBound && !lastX){
+                        isInside = false;
+                        chart.highlightValues(null);
                         lastX = true;
                         lastY = false;
                         lastTitulo = false;
@@ -297,6 +334,8 @@ public class BarChartActivity extends AppCompatActivity {
 
                     // Se for arrastado para o labelY
                     if((x < leftBound) && !lastY){
+                        isInside = false;
+                        chart.highlightValues(null);
                         lastY = true;
                         lastX = false;
                         lastTitulo = false;
@@ -307,6 +346,9 @@ public class BarChartActivity extends AppCompatActivity {
                 }
 
                 if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    isInside = false;
+                    lastHighlight = null;
+                    chart.highlightValues(null);
                     lastTitulo = true;
                     lastX = false;
                     lastY = false;
@@ -328,26 +370,30 @@ public class BarChartActivity extends AppCompatActivity {
                 int upperBound = chart.getTop();
                 int downerBound = chart.getBottom();
 
-                System.out.println("X Y da outra: " + event.getRawX() + " " + event.getRawY());
+                System.out.println("YLABEL: X Y da outra: " + event.getRawX() + " " + event.getRawY());
                 if(event.getAction() == MotionEvent.ACTION_MOVE) {
                     if(isViewInBounds(chart, x, y)) {
+                        isInside = true;
 
                         MotionEvent newTouch = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), MotionEvent.ACTION_DOWN,
                                 event.getRawX(), event.getRawY(), event.getMetaState());
                         Highlight highlight = chart.getHighlightByTouchPoint(event.getRawX() - chart.getLeft(), event.getRawY() - chart.getTop());
 
-                        if(!first) {
                             if (!highlight.equalTo(lastHighlight)) {
                                 lastHighlight = highlight;
                                 chart.highlightValue(highlight, true);
                             }
-                        }
                         lastHighlight = highlight;
                         first = false;
+                        lastTitulo = false;
+                        lastY = false;
+                        lastX = false;
                     }
 
                     // Se for arrastado para o Titulo
                     if(y < upperBound && !lastTitulo) {
+                        isInside = false;
+                        chart.highlightValues(null);
                         lastTitulo = true;
                         lastX = false;
                         lastY = false;
@@ -358,6 +404,8 @@ public class BarChartActivity extends AppCompatActivity {
 
                     // Se for arrastado para o LabelX
                     if(y > downerBound && !lastX){
+                        isInside = false;
+                        chart.highlightValues(null);
                         lastX = true;
                         lastY = false;
                         lastTitulo = false;
@@ -367,6 +415,9 @@ public class BarChartActivity extends AppCompatActivity {
 
                     // Se for arrastado para o labelY
                     if((x < leftBound) && !lastY){
+                        isInside = false;
+                        chart.highlightValues(null);
+                        lastHighlight = null;
                         lastY = true;
                         lastX = false;
                         lastTitulo = false;
@@ -376,11 +427,38 @@ public class BarChartActivity extends AppCompatActivity {
 
                 }
 
-                if(event.getAction() == MotionEvent.ACTION_DOWN && x < leftBound) {
-                    lastY = true;
-                    lastX = false;
-                    lastTitulo = false;
-                    tts(ylabel.getText().toString());
+                if(event.getAction() == MotionEvent.ACTION_DOWN ) {
+                    if(x < leftBound) {
+                        isInside = false;
+                        chart.highlightValues(null);
+                        lastHighlight = null;
+                        lastY = true;
+                        lastX = false;
+                        lastTitulo = false;
+                        tts(ylabel.getText().toString());
+                    }
+
+                    if(isViewInBounds(chart, x, y)){
+
+                        if(isViewInBounds(chart, x, y)) {
+                            isInside = true;
+
+                            MotionEvent newTouch = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), MotionEvent.ACTION_DOWN,
+                                    event.getRawX(), event.getRawY(), event.getMetaState());
+                            Highlight highlight = chart.getHighlightByTouchPoint(event.getRawX() - chart.getLeft(), event.getRawY() - chart.getTop());
+
+                            if (!highlight.equalTo(lastHighlight)) {
+                                lastHighlight = highlight;
+                                chart.highlightValue(highlight, true);
+                            }
+                            lastHighlight = highlight;
+                            first = false;
+                            lastTitulo = false;
+                            lastY = false;
+                            lastX = false;
+                        }
+
+                    }
                 }
 
                 return true;
@@ -398,26 +476,31 @@ public class BarChartActivity extends AppCompatActivity {
                 int upperBound = chart.getTop();
                 int downerBound = chart.getBottom() + (chart.getBottom()/12);
 
-                System.out.println("X Y da outra: " + event.getRawX() + " " + event.getRawY());
+                System.out.println("XLABEL: X Y da outra: " + event.getRawX() + " " + event.getRawY());
                 if(event.getAction() == MotionEvent.ACTION_MOVE) {
                     if(isViewInBounds(chart, x, y)) {
+                        isInside = true;
 
                         MotionEvent newTouch = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), MotionEvent.ACTION_DOWN,
                                 event.getRawX(), event.getRawY(), event.getMetaState());
                         Highlight highlight = chart.getHighlightByTouchPoint(event.getRawX() - chart.getLeft(), event.getRawY() - chart.getTop());
 
-                        if(!first) {
                             if (!highlight.equalTo(lastHighlight)) {
                                 lastHighlight = highlight;
                                 chart.highlightValue(highlight, true);
                             }
-                        }
+
                         lastHighlight = highlight;
                         first = false;
+                        lastTitulo = false;
+                        lastY = false;
+                        lastX = false;
                     }
 
                     // Se for arrastado para o Titulo
                     if(y < upperBound && !lastTitulo) {
+                        isInside = false;
+                        chart.highlightValues(null);
                         lastTitulo = true;
                         lastX = false;
                         lastY = false;
@@ -428,6 +511,9 @@ public class BarChartActivity extends AppCompatActivity {
 
                     // Se for arrastado para o LabelX
                     if(y > downerBound && !lastX){
+                        isInside = false;
+                        chart.highlightValues(null);
+                        lastHighlight = null;
                         lastX = true;
                         lastY = false;
                         lastTitulo = false;
@@ -437,6 +523,8 @@ public class BarChartActivity extends AppCompatActivity {
 
                     // Se for arrastado para o labelY
                     if((x < leftBound) && !lastY){
+                        isInside = false;
+                        chart.highlightValues(null);
                         lastY = true;
                         lastX = false;
                         lastTitulo = false;
@@ -447,6 +535,13 @@ public class BarChartActivity extends AppCompatActivity {
                 }
 
                 if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    if((x < leftBound) && !lastY) {
+
+
+                    }
+                    isInside = false;
+                    lastHighlight = null;
+                    chart.highlightValues(null);
                     lastX = true;
                     lastY = false;
                     lastTitulo = false;
@@ -472,26 +567,33 @@ public class BarChartActivity extends AppCompatActivity {
                 int upperBound = chart.getTop();
                 int downerBound = chart.getBottom() + (chart.getBottom()/12);
 
-                System.out.println("X Y da outra: " + event.getRawX() + " " + event.getRawY());
+                System.out.println("CONSTRAINR: X Y da outra: " + event.getRawX() + " " + event.getRawY());
                 if(event.getAction() == MotionEvent.ACTION_MOVE) {
                     if(isViewInBounds(chart, x, y)) {
+                        isInside = true;
 
                         MotionEvent newTouch = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), MotionEvent.ACTION_DOWN,
                                 event.getRawX(), event.getRawY(), event.getMetaState());
                         Highlight highlight = chart.getHighlightByTouchPoint(event.getRawX() - chart.getLeft(), event.getRawY() - chart.getTop());
 
-                        if(!first) {
+
                             if (!highlight.equalTo(lastHighlight)) {
                                 lastHighlight = highlight;
                                 chart.highlightValue(highlight, true);
                             }
-                        }
+
                         lastHighlight = highlight;
                         first = false;
+                        lastTitulo = false;
+                        lastY = false;
+                        lastX = false;
                     }
 
                     // Se for arrastado para o Titulo
                     if(y < upperBound && !lastTitulo) {
+                        isInside = false;
+                        chart.highlightValues(null);
+                        lastHighlight = null;
                         lastTitulo = true;
                         lastX = false;
                         lastY = false;
@@ -502,6 +604,9 @@ public class BarChartActivity extends AppCompatActivity {
 
                     // Se for arrastado para o LabelX
                     if(y > downerBound && !lastX){
+                        isInside = false;
+                        chart.highlightValues(null);
+                        lastHighlight = null;
                         lastX = true;
                         lastY = false;
                         lastTitulo = false;
@@ -511,6 +616,9 @@ public class BarChartActivity extends AppCompatActivity {
 
                     // Se for arrastado para o labelY
                     if((x < leftBound) && !lastY){
+                        isInside = false;
+                        chart.highlightValues(null);
+                        lastHighlight = null;
                         lastY = true;
                         lastX = false;
                         lastTitulo = false;
@@ -522,8 +630,13 @@ public class BarChartActivity extends AppCompatActivity {
 
                 if(event.getAction() == MotionEvent.ACTION_DOWN) {
 
+
+
                     // Se for arrastado para o Titulo
                     if(y < upperBound) {
+                        isInside = false;
+                        lastHighlight = null;
+                        chart.highlightValues(null);
                         lastTitulo = true;
                         lastX = false;
                         lastY = false;
@@ -534,6 +647,9 @@ public class BarChartActivity extends AppCompatActivity {
 
                     // Se for arrastado para o LabelX
                     if(y > downerBound){
+                        lastHighlight = null;
+                        isInside = false;
+                        chart.highlightValues(null);
                         lastX = true;
                         lastY = false;
                         lastTitulo = false;
@@ -543,13 +659,15 @@ public class BarChartActivity extends AppCompatActivity {
 
                     // Se for arrastado para o labelY
                     if((x < leftBound)){
+                        lastHighlight = null;
+                        isInside = false;
+                        chart.highlightValues(null);
                         lastY = true;
                         lastX = false;
                         lastTitulo = false;
                         tts(ylabel.getText().toString());
                         //Here goes code to execute on onTouch ViewA
                     }
-
                 }
 
                 return true;
