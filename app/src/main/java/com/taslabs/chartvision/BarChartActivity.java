@@ -65,6 +65,13 @@ public class BarChartActivity extends AppCompatActivity {
     boolean isInside = true;
     Highlight lastHighlight;
 
+    // Flags pro TTS
+    public static final int FLAG_TITULO = 0;
+    public static final int FLAG_XLABEL = 1;
+    public static final int FLAG_YLABEL = 2;
+    public static final int FLAG_CHARTVALUE = 3;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -190,8 +197,9 @@ public class BarChartActivity extends AppCompatActivity {
                     lastY = false;
 
 
-                    Long entryX = (long) entry.getY();
-                    Toast.makeText(getApplicationContext(), String.valueOf(entryX), Toast.LENGTH_LONG).show();
+                    Long entryY = (long) entry.getY();
+                    int entryX = (int) entry.getX();
+                    Toast.makeText(getApplicationContext(), String.valueOf(entryY), Toast.LENGTH_LONG).show();
 
                     Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                     // Vibrate for 500 milliseconds
@@ -202,7 +210,7 @@ public class BarChartActivity extends AppCompatActivity {
                         v.vibrate(100);
                     }
 
-                    tts(String.valueOf(entryX));
+                    fitInTemplate(String.valueOf(entryY), FLAG_CHARTVALUE, entryX);
                 }
 
                 else{
@@ -234,7 +242,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastTitulo = true;
                         lastX = false;
                         lastY = false;
-                        tts(titulo.getText().toString());
+                        fitInTemplate(titulo.getText().toString(), FLAG_TITULO, -1);
                         chart.highlightValues(null);
 
                     }
@@ -245,7 +253,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastX = true;
                         lastY = false;
                         lastTitulo = false;
-                        tts(xlabel.getText().toString());
+                        fitInTemplate(xlabel.getText().toString(), FLAG_XLABEL, -1);
                         chart.highlightValues(null);
                         //Here goes code to execute on onTouch ViewA
                     }
@@ -256,7 +264,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastY = true;
                         lastX = false;
                         lastTitulo = false;
-                        tts(ylabel.getText().toString());
+                        fitInTemplate(ylabel.getText().toString(), FLAG_YLABEL, -1);
                         chart.highlightValues(null);
                         //Here goes code to execute on onTouch ViewA
                     }
@@ -286,7 +294,7 @@ public class BarChartActivity extends AppCompatActivity {
 
                 int leftBound = chart.getLeft();
                 int upperBound = chart.getTop();
-                int downerBound = chart.getBottom();
+                int downerBound = chart.getBottom() + (chart.getBottom()/12);
 
                 System.out.println("TITULO: X Y da outra: " + event.getRawX() + " " + event.getRawY());
                 if(event.getAction() == MotionEvent.ACTION_MOVE) {
@@ -316,7 +324,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastTitulo = true;
                         lastX = false;
                         lastY = false;
-                        tts(titulo.getText().toString());
+                        fitInTemplate(titulo.getText().toString(), FLAG_TITULO, -1);
 
                         Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
                     }
@@ -328,7 +336,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastX = true;
                         lastY = false;
                         lastTitulo = false;
-                        tts(xlabel.getText().toString());
+                        fitInTemplate(xlabel.getText().toString(), FLAG_XLABEL, -1);
                         //Here goes code to execute on onTouch ViewA
                     }
 
@@ -339,7 +347,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastY = true;
                         lastX = false;
                         lastTitulo = false;
-                        tts(ylabel.getText().toString());
+                        fitInTemplate(ylabel.getText().toString(), FLAG_YLABEL, -1);
                         //Here goes code to execute on onTouch ViewA
                     }
 
@@ -352,7 +360,7 @@ public class BarChartActivity extends AppCompatActivity {
                     lastTitulo = true;
                     lastX = false;
                     lastY = false;
-                    tts(titulo.getText().toString());
+                    fitInTemplate(titulo.getText().toString(), FLAG_TITULO, -1);
                 }
 
                 return true;
@@ -368,7 +376,7 @@ public class BarChartActivity extends AppCompatActivity {
 
                 int leftBound = chart.getLeft();
                 int upperBound = chart.getTop();
-                int downerBound = chart.getBottom();
+                int downerBound = chart.getBottom() + (chart.getBottom()/12);
 
                 System.out.println("YLABEL: X Y da outra: " + event.getRawX() + " " + event.getRawY());
                 if(event.getAction() == MotionEvent.ACTION_MOVE) {
@@ -397,7 +405,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastTitulo = true;
                         lastX = false;
                         lastY = false;
-                        tts(titulo.getText().toString());
+                        fitInTemplate(titulo.getText().toString(), FLAG_TITULO, -1);
 
                         Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
                     }
@@ -409,7 +417,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastX = true;
                         lastY = false;
                         lastTitulo = false;
-                        tts(xlabel.getText().toString());
+                        fitInTemplate(xlabel.getText().toString(), FLAG_XLABEL, -1);
                         //Here goes code to execute on onTouch ViewA
                     }
 
@@ -421,7 +429,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastY = true;
                         lastX = false;
                         lastTitulo = false;
-                        tts(ylabel.getText().toString());
+                        fitInTemplate(ylabel.getText().toString(), FLAG_YLABEL, -1);
                         //Here goes code to execute on onTouch ViewA
                     }
 
@@ -435,7 +443,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastY = true;
                         lastX = false;
                         lastTitulo = false;
-                        tts(ylabel.getText().toString());
+                        fitInTemplate(ylabel.getText().toString(), FLAG_YLABEL, -1);
                     }
 
                     if(isViewInBounds(chart, x, y)){
@@ -504,7 +512,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastTitulo = true;
                         lastX = false;
                         lastY = false;
-                        tts(titulo.getText().toString());
+                        fitInTemplate(titulo.getText().toString(), FLAG_TITULO, -1);
 
                         Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
                     }
@@ -517,7 +525,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastX = true;
                         lastY = false;
                         lastTitulo = false;
-                        tts(xlabel.getText().toString());
+                        fitInTemplate(xlabel.getText().toString(), FLAG_XLABEL, -1);
                         //Here goes code to execute on onTouch ViewA
                     }
 
@@ -528,7 +536,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastY = true;
                         lastX = false;
                         lastTitulo = false;
-                        tts(ylabel.getText().toString());
+                        fitInTemplate(ylabel.getText().toString(), FLAG_YLABEL, -1);
                         //Here goes code to execute on onTouch ViewA
                     }
 
@@ -545,7 +553,7 @@ public class BarChartActivity extends AppCompatActivity {
                     lastX = true;
                     lastY = false;
                     lastTitulo = false;
-                    tts(xlabel.getText().toString());
+                    fitInTemplate(xlabel.getText().toString(), FLAG_XLABEL, -1);
                     System.out.println("FOI DO X LABEL");
                     //Here goes code to execute on onTouch ViewA
                 }
@@ -597,7 +605,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastTitulo = true;
                         lastX = false;
                         lastY = false;
-                        tts(titulo.getText().toString());
+                        fitInTemplate(titulo.getText().toString(), FLAG_TITULO, -1);
 
                         Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
                     }
@@ -610,7 +618,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastX = true;
                         lastY = false;
                         lastTitulo = false;
-                        tts(xlabel.getText().toString());
+                        fitInTemplate(xlabel.getText().toString(), FLAG_XLABEL, -1);
                         //Here goes code to execute on onTouch ViewA
                     }
 
@@ -622,7 +630,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastY = true;
                         lastX = false;
                         lastTitulo = false;
-                        tts(ylabel.getText().toString());
+                        fitInTemplate(ylabel.getText().toString(), FLAG_YLABEL, -1);
                         //Here goes code to execute on onTouch ViewA
                     }
 
@@ -640,7 +648,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastTitulo = true;
                         lastX = false;
                         lastY = false;
-                        tts(titulo.getText().toString());
+                        fitInTemplate(titulo.getText().toString(), FLAG_TITULO, -1);
 
                         Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
                     }
@@ -653,7 +661,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastX = true;
                         lastY = false;
                         lastTitulo = false;
-                        tts(xlabel.getText().toString());
+                        fitInTemplate(xlabel.getText().toString(), FLAG_XLABEL, -1);
                         //Here goes code to execute on onTouch ViewA
                     }
 
@@ -665,7 +673,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastY = true;
                         lastX = false;
                         lastTitulo = false;
-                        tts(ylabel.getText().toString());
+                        fitInTemplate(ylabel.getText().toString(), FLAG_YLABEL, -1);
                         //Here goes code to execute on onTouch ViewA
                     }
                 }
@@ -683,5 +691,28 @@ public class BarChartActivity extends AppCompatActivity {
         return outRect.contains(x, y);
     }
 
+    private void fitInTemplate(String value, int flag, int index){
+        String tituloStr = "O título é denominado. ";
+        String legendayStr =  "A legenda do eixo y é denominada. ";
+        String legendaxStr =  "A legenda do eixo x é denominada. ";
+
+        switch(flag){
+            case FLAG_TITULO:
+                tts(tituloStr + value);
+                break;
+            case FLAG_XLABEL:
+                tts(legendaxStr + value);
+                break;
+            case FLAG_YLABEL:
+                tts(legendayStr + value);
+                break;
+            case FLAG_CHARTVALUE:
+                tts("A" + (index + 1) + "ª barra é denominada. " + chartData.getLabels()[index] + " e apresenta valor. " + value);
+                //Do this and this:
+                break;
+            default: //For all other cases, do this
+                break;
+        }
+    }
 
 }
