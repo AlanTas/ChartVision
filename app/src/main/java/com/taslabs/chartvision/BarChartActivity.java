@@ -2,6 +2,8 @@ package com.taslabs.chartvision;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Rect;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -51,6 +53,7 @@ public class BarChartActivity extends AppCompatActivity {
     TextView ylabel;
     ConstraintLayout constraintLayout;
     String url = null;
+    Vibrator v;
 
     // in View Bounds variables
     Rect outRect = new Rect();
@@ -71,6 +74,11 @@ public class BarChartActivity extends AppCompatActivity {
     public static final int FLAG_YLABEL = 2;
     public static final int FLAG_CHARTVALUE = 3;
 
+    //SHAKE VARIABLES
+    private SensorManager mSensorManager;
+    private Sensor mAccelerometer;
+    private ShakeHelper mShakeHelper;
+
 
 
     @Override
@@ -83,6 +91,8 @@ public class BarChartActivity extends AppCompatActivity {
         xlabel = findViewById(R.id.xlabel);
         ylabel = findViewById(R.id.ylabel);
         constraintLayout = findViewById(R.id.layout);
+
+        v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
@@ -97,7 +107,31 @@ public class BarChartActivity extends AppCompatActivity {
                             }
                         }
                     }
+
+                    tts("Por favor, desligue o recurso Tólque Béque. Para sair da visualização do gráfico, sacuda seu aparelho");
                 }
+            }
+        });
+
+        // ShakeDetector initialization
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        mShakeHelper = new ShakeHelper();
+
+        mShakeHelper.setOnShakeListener(new ShakeHelper.OnShakeListener() {
+
+            @Override
+            public void onShake(int count) {
+                /*
+                 * The following method, "handleShakeEvent(count):" is a stub //
+                 * method you would use to setup whatever you want done once the
+                 * device has been shook.
+                 */
+
+                textToSpeech.stop();
+                tts("Saindo. Por favor, re-ligue o recurso Tólque Béque");
+                finish();
             }
         });
 
@@ -111,12 +145,8 @@ public class BarChartActivity extends AppCompatActivity {
         chartData = jsonParser.getBarChartObj();
         startListeners();
         stpChart();
+        hideSystemUI();
 
-
-//        jsonParser.loadJSONFromAsset(this);
-//        chartData = jsonParser.getBarChartObj();
-//        starListeners();
-//        stpChart();
 
     }
 
@@ -179,6 +209,19 @@ public class BarChartActivity extends AppCompatActivity {
         }
     }
 
+    private void vibrate(int duration){
+
+        // Vibrate for 500 milliseconds
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            //deprecated in API 26
+            v.vibrate(duration);
+        }
+
+
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     public void startListeners(){
 
@@ -191,7 +234,6 @@ public class BarChartActivity extends AppCompatActivity {
 
 
                 if (isInside) {
-                    System.out.println("RESETOU");
                     lastTitulo = false;
                     lastX = false;
                     lastY = false;
@@ -200,16 +242,6 @@ public class BarChartActivity extends AppCompatActivity {
                     Long entryY = (long) entry.getY();
                     int entryX = (int) entry.getX();
                     Toast.makeText(getApplicationContext(), String.valueOf(entryY), Toast.LENGTH_LONG).show();
-
-                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                    // Vibrate for 500 milliseconds
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
-                    } else {
-                        //deprecated in API 26
-                        v.vibrate(100);
-                    }
-
                     fitInTemplate(String.valueOf(entryY), FLAG_CHARTVALUE, entryX);
                 }
 
@@ -229,8 +261,6 @@ public class BarChartActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 int x = (int)event.getRawX();
                 int y = (int)event.getRawY();
-                System.out.println("X - " + x);
-                System.out.println("Y - " + y);
                 int leftBound = v.getLeft();
                 int upperBound = v.getTop();
                 int downerBound = v.getBottom() + (v.getBottom()/12);
@@ -296,7 +326,7 @@ public class BarChartActivity extends AppCompatActivity {
                 int upperBound = chart.getTop();
                 int downerBound = chart.getBottom() + (chart.getBottom()/12);
 
-                System.out.println("TITULO: X Y da outra: " + event.getRawX() + " " + event.getRawY());
+
                 if(event.getAction() == MotionEvent.ACTION_MOVE) {
                     if(isViewInBounds(chart, x, y)) {
                         isInside = true;
@@ -378,7 +408,7 @@ public class BarChartActivity extends AppCompatActivity {
                 int upperBound = chart.getTop();
                 int downerBound = chart.getBottom() + (chart.getBottom()/12);
 
-                System.out.println("YLABEL: X Y da outra: " + event.getRawX() + " " + event.getRawY());
+
                 if(event.getAction() == MotionEvent.ACTION_MOVE) {
                     if(isViewInBounds(chart, x, y)) {
                         isInside = true;
@@ -484,7 +514,7 @@ public class BarChartActivity extends AppCompatActivity {
                 int upperBound = chart.getTop();
                 int downerBound = chart.getBottom() + (chart.getBottom()/12);
 
-                System.out.println("XLABEL: X Y da outra: " + event.getRawX() + " " + event.getRawY());
+
                 if(event.getAction() == MotionEvent.ACTION_MOVE) {
                     if(isViewInBounds(chart, x, y)) {
                         isInside = true;
@@ -554,7 +584,7 @@ public class BarChartActivity extends AppCompatActivity {
                     lastY = false;
                     lastTitulo = false;
                     fitInTemplate(xlabel.getText().toString(), FLAG_XLABEL, -1);
-                    System.out.println("FOI DO X LABEL");
+
                     //Here goes code to execute on onTouch ViewA
                 }
 
@@ -575,7 +605,7 @@ public class BarChartActivity extends AppCompatActivity {
                 int upperBound = chart.getTop();
                 int downerBound = chart.getBottom() + (chart.getBottom()/12);
 
-                System.out.println("CONSTRAINR: X Y da outra: " + event.getRawX() + " " + event.getRawY());
+
                 if(event.getAction() == MotionEvent.ACTION_MOVE) {
                     if(isViewInBounds(chart, x, y)) {
                         isInside = true;
@@ -699,20 +729,54 @@ public class BarChartActivity extends AppCompatActivity {
         switch(flag){
             case FLAG_TITULO:
                 tts(tituloStr + value);
+                vibrate(200);
                 break;
             case FLAG_XLABEL:
                 tts(legendaxStr + value);
+                vibrate(200);
                 break;
             case FLAG_YLABEL:
                 tts(legendayStr + value);
+                vibrate(200);
                 break;
             case FLAG_CHARTVALUE:
                 tts("A" + (index + 1) + "ª barra é denominada. " + chartData.getLabels()[index] + " e apresenta valor. " + value);
+                vibrate(100);
                 //Do this and this:
                 break;
             default: //For all other cases, do this
                 break;
         }
+    }
+
+    private void hideSystemUI() {
+        // Enables regular immersive mode.
+        // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
+        // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_IMMERSIVE
+                        // Set the content to appear under the system bars so that the
+                        // content doesn't resize when the system bars hide and show.
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        // Hide the nav bar and status bar
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mSensorManager.registerListener(mShakeHelper, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mSensorManager.unregisterListener(mShakeHelper);
     }
 
 }

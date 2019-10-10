@@ -4,6 +4,7 @@ package com.taslabs.chartvision;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -11,21 +12,28 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 import android.nfc.tech.MifareUltralight;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.provider.Settings;
+import android.speech.tts.TextToSpeech;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.taslabs.chartvision.records.ParsedNdefRecord;
 
 import java.util.List;
+import java.util.Locale;
 
 public class NFCActivity extends AppCompatActivity {
 
     TextView text;
     NfcAdapter nfcAdapter;
     PendingIntent pendingIntent;
+    TextToSpeech textToSpeech;
+    Vibrator v;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +41,7 @@ public class NFCActivity extends AppCompatActivity {
         setContentView(R.layout.activity_nfc);
         text = (TextView) findViewById(R.id.text);
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         if (nfcAdapter == null) {
             Toast.makeText(this, "No NFC", Toast.LENGTH_SHORT).show();
@@ -43,6 +52,46 @@ public class NFCActivity extends AppCompatActivity {
         pendingIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, this.getClass())
                         .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+
+        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int res = textToSpeech.setLanguage(new Locale("pt", "BR"));
+                    if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        res = textToSpeech.setLanguage(Locale.getDefault());
+                        if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
+                            res = textToSpeech.setLanguage(Locale.US);
+                            if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
+                            }
+                        }
+                    }
+
+                    tts("Aproxime seu aparelho da tég NFC");
+                }
+            }
+        });
+    }
+
+    public void tts(String text){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+        }
+        else {
+            textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+        }
+    }
+
+    private void vibrate(int duration){
+
+        // Vibrate for 500 milliseconds
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            //deprecated in API 26
+            v.vibrate(duration);
+        }
+
     }
 
     @Override
@@ -243,6 +292,8 @@ public class NFCActivity extends AppCompatActivity {
         text.setText(builder.toString());
         String intentData = builder.toString();
 
+        tts("Tég detectada!");
+        vibrate(100);
         Intent i = new Intent(NFCActivity.this, BarChartActivity.class);
         i.putExtra("url", intentData);
         startActivity(i);

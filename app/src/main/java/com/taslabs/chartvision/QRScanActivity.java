@@ -2,10 +2,18 @@ package com.taslabs.chartvision;
 
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Camera;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.speech.tts.TextToSpeech;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -14,6 +22,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -23,53 +32,85 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.Locale;
 
 public class QRScanActivity extends AppCompatActivity {
 
 
     SurfaceView surfaceView;
-    TextView txtBarcodeValue;
     private BarcodeDetector barcodeDetector;
     private CameraSource cameraSource;
     private static final int REQUEST_CAMERA_PERMISSION = 201;
     String intentData = "";
-    boolean isEmail = false;
+    TextToSpeech textToSpeech;
+
+    //SHAKE VARIABLES
+    private SensorManager mSensorManager;
+    private Sensor mAccelerometer;
+    private ShakeHelper mShakeHelper;
+    Vibrator v;
+
+    private Camera camera = null;
+    boolean flashmode=false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qrscan);
-
         initViews();
+
+        v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        // ShakeDetector initialization
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        mShakeHelper = new ShakeHelper();
+
+        mShakeHelper.setOnShakeListener(new ShakeHelper.OnShakeListener() {
+
+            @Override
+            public void onShake(int count) {
+                /*
+                 * The following method, "handleShakeEvent(count):" is a stub //
+                 * method you would use to setup whatever you want done once the
+                 * device has been shook.
+                 */
+                if(cameraSource != null){
+                    flashOnButton();
+                }
+            }
+        });
+
     }
 
     private void initViews() {
-        txtBarcodeValue = findViewById(R.id.txtBarcodeValue);
         surfaceView = findViewById(R.id.surfaceView);
-//        btnAction = findViewById(R.id.btnAction);
 
-
-//        btnAction.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                if (intentData.length() > 0) {
-//                    if (isEmail)
-//                        startActivity(new Intent(ScannedBarcodeActivity.this, EmailActivity.class).putExtra("email_address", intentData));
-//                    else {
-//                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(intentData)));
-//                    }
-//                }
-//
-//
-//            }
-//        });
     }
 
     private void initialiseDetectorsAndSources() {
 
-        Toast.makeText(getApplicationContext(), "Barcode scanner started", Toast.LENGTH_SHORT).show();
+        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int res = textToSpeech.setLanguage(new Locale("pt", "BR"));
+                    if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        res = textToSpeech.setLanguage(Locale.getDefault());
+                        if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
+                            res = textToSpeech.setLanguage(Locale.US);
+                            if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
+                            }
+                        }
+                    }
+
+                    tts("Para ligar e desligar o flash, sacuda seu aparelho.");
+                }
+            }
+        });
+
 
         barcodeDetector = new BarcodeDetector.Builder(this)
                 .setBarcodeFormats(Barcode.QR_CODE)
@@ -78,7 +119,6 @@ public class QRScanActivity extends AppCompatActivity {
         cameraSource = new CameraSource.Builder(this, barcodeDetector)
                 .setAutoFocusEnabled(true)
                 .setRequestedPreviewSize(1920, 1080)
-               // .setAutoFocusEnabled(true) //you should add this feature
                 .build();
 
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
@@ -96,7 +136,6 @@ public class QRScanActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-
             }
 
             @Override
@@ -113,7 +152,6 @@ public class QRScanActivity extends AppCompatActivity {
         barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
             @Override
             public void release() {
-                Toast.makeText(getApplicationContext(), "To prevent memory leaks barcode scanner has been stopped", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -123,49 +161,99 @@ public class QRScanActivity extends AppCompatActivity {
                     intentData = barcodes.valueAt(0).displayValue;
                     System.out.println(intentData);
 
+                    tts("QR Detectado");
+                    vibrate(100);
                     Intent i = new Intent(QRScanActivity.this, BarChartActivity.class);
                     i.putExtra("url", intentData);
                     startActivity(i);
 
 
-
-//
-//                    txtBarcodeValue.post(new Runnable() {
-//
-//                        @Override
-//                        public void run() {
-//
-//                            if (barcodes.valueAt(0).email != null) {
-//                                txtBarcodeValue.removeCallbacks(null);
-//                                intentData = barcodes.valueAt(0).email.address;
-//                                txtBarcodeValue.setText(intentData);
-//                                isEmail = true;
-//                            } else {
-//                                isEmail = false;
-//                                intentData = barcodes.valueAt(0).displayValue;
-//                                txtBarcodeValue.setText(intentData);
-//
-//                            }
-//                        }
-//                    });
-
                 }
             }
         });
+
     }
 
+    private void vibrate(int duration){
+
+        // Vibrate for 500 milliseconds
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            //deprecated in API 26
+            v.vibrate(duration);
+        }
+
+    }
 
     @Override
     protected void onPause() {
         super.onPause();
         cameraSource.release();
+        mSensorManager.unregisterListener(mShakeHelper);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         initialiseDetectorsAndSources();
+        mSensorManager.registerListener(mShakeHelper, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+    }
 
 
+    @Override
+    protected void onStart(){
+        super.onStart();
+    }
+
+    public void tts(String text){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+        }
+        else {
+            textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+        }
+    }
+
+    private void flashOnButton() {
+        camera=getCamera(cameraSource);
+        if (camera != null) {
+            try {
+                Camera.Parameters param = camera.getParameters();
+                param.setFlashMode(!flashmode?Camera.Parameters.FLASH_MODE_TORCH :Camera.Parameters.FLASH_MODE_OFF);
+                camera.setParameters(param);
+                flashmode = !flashmode;
+                if(flashmode){
+
+                    tts("Flash ligado!");
+                }
+                else {
+
+                    tts("Flash desligado!");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    private static Camera getCamera(@NonNull CameraSource cameraSource) {
+        Field[] declaredFields = CameraSource.class.getDeclaredFields();
+
+        for (Field field : declaredFields) {
+            if (field.getType() == Camera.class) {
+                field.setAccessible(true);
+                try {
+                    Camera camera = (Camera) field.get(cameraSource);
+                    if (camera != null) {
+                        return camera;
+                    }
+                    return null;
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+        }
+        return null;
     }
 }
