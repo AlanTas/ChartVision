@@ -50,7 +50,6 @@ public class ShakeHelper implements SensorEventListener {
 
             // gForce will be close to 1 when there is no movement.
             float gForce = (float)Math.sqrt(gX * gX + gY * gY + gZ * gZ);
-            System.out.println(String.valueOf(gForce));
 
             if (gForce > SHAKE_THRESHOLD_GRAVITY) {
                 final long now = System.currentTimeMillis();

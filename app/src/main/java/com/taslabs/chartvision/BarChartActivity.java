@@ -53,6 +53,7 @@ public class BarChartActivity extends AppCompatActivity {
     TextView ylabel;
     ConstraintLayout constraintLayout;
     String url = null;
+    String json = null;
     Vibrator v;
 
     // in View Bounds variables
@@ -135,13 +136,22 @@ public class BarChartActivity extends AppCompatActivity {
             }
         });
 
+        JsonParser jsonParser = new JsonParser();
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            url = extras.getString("url");
+            if (extras.containsKey("url")) {
+                url = extras.getString("url");
+                jsonParser.loadJSONFromURL(url);
+            }
+
+            else if(extras.containsKey("json")){
+                json = extras.getString("json");
+                jsonParser.loadJSONFromJsonString(json);
+            }
         }
 
-        JsonParser jsonParser = new JsonParser();
-        jsonParser.loadJSONFromURL(url);
+
+
         chartData = jsonParser.getBarChartObj();
         startListeners();
         stpChart();

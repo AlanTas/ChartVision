@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.github.mikephil.charting.charts.BarChart;
 
 public class MainActivity extends AppCompatActivity {
-    Button btnBarChart, btnQR, btnNFC;
+    Button btnBarChart, btnQR, btnNFC, btnLOCAL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +42,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent I = new Intent(MainActivity.this, NFCActivity.class);
+                startActivity(I);
+            }
+        });
+
+        btnLOCAL = findViewById(R.id.btnLocal);
+        btnLOCAL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent I = new Intent(MainActivity.this, LocalFileActivity.class);
                 startActivity(I);
             }
         });

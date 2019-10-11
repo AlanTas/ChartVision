@@ -4,16 +4,20 @@ import com.taslabs.chartvision.BarChartObj;
 import android.content.Context;
 import android.os.AsyncTask;
 
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
@@ -56,6 +60,19 @@ public class JsonParser {
 
         return json;
     }
+
+    public void loadJSONFromJsonString(String json) {
+
+        try {
+            obj = new JSONObject(json);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        getDataFromJson(obj);
+
+    }
+
 
     public String loadJSONFromURL(String url) {
 
@@ -141,22 +158,51 @@ class MyTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... params) {
 
         HttpsURLConnection con = null;
+        URLConnection conFile = null;
 
         try {
-            URL u = new URL(params[0]);
-            con = (HttpsURLConnection) u.openConnection();
+            if(params[0].contains("https")) {
+                URL u = new URL(params[0]);
+                con = (HttpsURLConnection) u.openConnection();
 
-            con.connect();
+                con.connect();
 
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line + "\n");
+                BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+                br.close();
+                return sb.toString();
             }
-            br.close();
-            return sb.toString();
+
+            else {
+
+                File file = new File(params[0]);
+
+
+                System.out.println("URL:" +  params[0]);
+                System.out.println("PATH:" + file.getCanonicalPath());
+
+                if(file.exists()) {
+                    System.out.println("EXISTE");
+                }
+                URL u = new URL(params[0]);
+                conFile = u.openConnection();
+
+                conFile.connect();
+
+                BufferedReader br = new BufferedReader(new InputStreamReader(conFile.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+                br.close();
+                return sb.toString();
+            }
 
 
 
