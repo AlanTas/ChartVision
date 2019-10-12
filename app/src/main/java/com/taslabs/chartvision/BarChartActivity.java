@@ -1,7 +1,10 @@
 package com.taslabs.chartvision;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Build;
@@ -16,10 +19,12 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.ColorInt;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -37,7 +42,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import com.github.mikephil.charting.utils.Utils;
 import com.taslabs.chartvision.JsonParser;
+import com.taslabs.chartvision.enums.FontSize;
 
 public class BarChartActivity extends AppCompatActivity {
     // global variables
@@ -80,6 +87,13 @@ public class BarChartActivity extends AppCompatActivity {
     private Sensor mAccelerometer;
     private ShakeHelper mShakeHelper;
 
+    //USER PREFS VARIABLES
+    public boolean ttsEnabled = true;
+    public boolean highContrastEnabled = false;
+    public boolean hapticEnabled = true;
+    public boolean vibrateToLeave = true;
+    public FontSize fontSize = FontSize.Small;
+
 
 
     @Override
@@ -109,7 +123,10 @@ public class BarChartActivity extends AppCompatActivity {
                         }
                     }
 
-                    tts("Por favor, desligue o recurso Tólque Béque. Para sair da visualização do gráfico, sacuda seu aparelho");
+                    tts("Por favor, desligue o recurso Tólque Béque", false);
+                    if(vibrateToLeave){
+                        tts("Para sair da visualização do gráfico, sacuda seu aparelho", true);
+                    }
                 }
             }
         });
@@ -124,15 +141,18 @@ public class BarChartActivity extends AppCompatActivity {
 
             @Override
             public void onShake(int count) {
-                /*
-                 * The following method, "handleShakeEvent(count):" is a stub //
-                 * method you would use to setup whatever you want done once the
-                 * device has been shook.
-                 */
+                if(vibrateToLeave) {
+                    /*
+                     * The following method, "handleShakeEvent(count):" is a stub //
+                     * method you would use to setup whatever you want done once the
+                     * device has been shook.
+                     */
 
-                textToSpeech.stop();
-                tts("Saindo. Por favor, re-ligue o recurso Tólque Béque");
-                finish();
+                    tts("Saindo. Por favor, re-ligue o recurso Tólque Béque", true);
+
+                    //textToSpeech.stop();
+                    finish();
+                }
             }
         });
 
@@ -154,15 +174,20 @@ public class BarChartActivity extends AppCompatActivity {
 
         chartData = jsonParser.getBarChartObj();
         startListeners();
-        stpChart();
-        hideSystemUI();
-
+        stpChart(fontSize, highContrastEnabled);
 
     }
 
 
-    public void stpChart(){
+    public void stpChart(FontSize fontSize, boolean highContrastEnabled){
 
+        XAxis xAxis = chart.getXAxis();
+
+        @ColorInt int colorBackground = Color.parseColor("#000000");
+        @ColorInt int colorFont = Color.parseColor("#ffff00");
+        @ColorInt int colorBars = Color.parseColor("#00ff00");
+
+        // Carregando dados do gráfico
         titulo.setText(chartData.getTitle());
         xlabel.setText(chartData.getxLabel());
         ylabel.setText(chartData.getyLabel());
@@ -177,59 +202,125 @@ public class BarChartActivity extends AppCompatActivity {
         }
 
         BarDataSet set = new BarDataSet(entries, "BarDataSet");
+        if(this.highContrastEnabled){
+            set.setColor(colorBars);
+        }
         BarData data = new BarData(set);
         chart.setData(data);
 
-
-        //data.setBarWidth(0.9f); // set custom bar width
-
+        // Configurações gerais do gráfico
         chart.setFitBars(true); // make the x-axis fit exactly all bars
         chart.invalidate(); // refresh
         chart.setDoubleTapToZoomEnabled(false);
         chart.setPinchZoom(false);
-        String[] labels = chartData.getLabels();
-        chart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
-        chart.getXAxis().setLabelCount(lenght);
-
         chart.getAxisLeft().setDrawGridLines(false);
-        chart.getXAxis().setDrawGridLines(false);
         chart.getLegend().setEnabled(false); //Desabilita a legenda
-
-        chart.getAxisLeft().setDrawGridLines(false);
-        chart.getAxisRight().setDrawGridLines(false);
+        chart.setScaleEnabled(false); // Disable all zooming
         chart.getXAxis().setDrawGridLines(false);
         chart.getDescription().setEnabled(false);
-
-        XAxis xAxis = chart.getXAxis();
-
+        chart.getAxisLeft().setDrawGridLines(false);
+        chart.getAxisRight().setDrawGridLines(false);
+        chart.getAxisRight().setEnabled(false);
+        String[] labels = chartData.getLabels();
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
+        xAxis.setLabelCount(lenght);
+        xAxis.setDrawGridLines(false);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        chart.setScaleEnabled(false); // Disable all zooming
 
-        YAxis rightYAxis = chart.getAxisRight();
-        rightYAxis.setEnabled(false);
+
+
+        // Configurações especificas
+
+
+        if(this.fontSize == FontSize.Small){
+            float left = 0f;
+            float top = 0f;
+            float right = 0f;
+            float bottom = 0f;
+
+            chart.getXAxis().setTextSize(10f);
+            chart.getAxisLeft().setTextSize(10f);
+            chart.getBarData().setValueTextSize(10f);
+
+
+            chart.setExtraOffsets(left, top, right, bottom);
+
+        }
+
+        else if(this.fontSize == FontSize.Medium) {
+            float left = 0f;
+            float top = 0f;
+            float right = 0f;
+            float bottom = 4f;
+
+            chart.getXAxis().setTextSize(15f);
+            chart.getAxisLeft().setTextSize(15f);
+            chart.getBarData().setValueTextSize(15f);
+
+
+            chart.setExtraOffsets(left, top, right, bottom);
+        }
+
+        else if(this.fontSize == FontSize.Large){
+            float left = 0f;
+            float top = 0f;
+            float right = 0f;
+            float bottom = 7f;
+
+            chart.getXAxis().setTextSize(20f);
+            chart.getAxisLeft().setTextSize(20f);
+            chart.getBarData().setValueTextSize(20f);
+
+
+            chart.setExtraOffsets(left, top, right, bottom);
+        }
+
+        if(this.highContrastEnabled){
+
+            chart.setBackgroundColor(colorBackground);
+            chart.getXAxis().setTextColor(colorFont);
+            chart.getAxisLeft().setTextColor(colorFont);
+            chart.getBarData().setValueTextColor(colorFont);
+
+            chart.getXAxis().setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+            chart.getAxisLeft().setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+            chart.getBarData().setValueTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+            titulo.setTextColor(colorFont);
+            ylabel.setTextColor(colorFont);
+            xlabel.setTextColor(colorFont);
+
+            titulo.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+            ylabel.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+            xlabel.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+
+            constraintLayout.setBackgroundColor(colorBackground);
+
+        }
+
+
 
     }
 
-    public void tts(String text){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
-        }
-        else {
-            textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+    public void tts(String text, boolean override){
+        if(ttsEnabled || override) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+            } else {
+                textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+            }
         }
     }
 
     private void vibrate(int duration){
-
-        // Vibrate for 500 milliseconds
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            v.vibrate(VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE));
-        } else {
-            //deprecated in API 26
-            v.vibrate(duration);
+        if(hapticEnabled) {
+            // Vibrate for 500 milliseconds
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                v.vibrate(VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else {
+                //deprecated in API 26
+                v.vibrate(duration);
+            }
         }
-
-
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -251,7 +342,7 @@ public class BarChartActivity extends AppCompatActivity {
 
                     Long entryY = (long) entry.getY();
                     int entryX = (int) entry.getX();
-                    Toast.makeText(getApplicationContext(), String.valueOf(entryY), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), String.valueOf(entryY), Toast.LENGTH_LONG).show();
                     fitInTemplate(String.valueOf(entryY), FLAG_CHARTVALUE, entryX);
                 }
 
@@ -366,7 +457,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastY = false;
                         fitInTemplate(titulo.getText().toString(), FLAG_TITULO, -1);
 
-                        Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
                     }
 
                     // Se for arrastado para o LabelX
@@ -447,7 +538,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastY = false;
                         fitInTemplate(titulo.getText().toString(), FLAG_TITULO, -1);
 
-                        Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
                     }
 
                     // Se for arrastado para o LabelX
@@ -554,7 +645,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastY = false;
                         fitInTemplate(titulo.getText().toString(), FLAG_TITULO, -1);
 
-                        Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
                     }
 
                     // Se for arrastado para o LabelX
@@ -647,7 +738,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastY = false;
                         fitInTemplate(titulo.getText().toString(), FLAG_TITULO, -1);
 
-                        Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
                     }
 
                     // Se for arrastado para o LabelX
@@ -690,7 +781,7 @@ public class BarChartActivity extends AppCompatActivity {
                         lastY = false;
                         fitInTemplate(titulo.getText().toString(), FLAG_TITULO, -1);
 
-                        Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), "Titulo", Toast.LENGTH_LONG).show();
                     }
 
                     // Se for arrastado para o LabelX
@@ -738,19 +829,19 @@ public class BarChartActivity extends AppCompatActivity {
 
         switch(flag){
             case FLAG_TITULO:
-                tts(tituloStr + value);
+                tts(tituloStr + value, false);
                 vibrate(200);
                 break;
             case FLAG_XLABEL:
-                tts(legendaxStr + value);
+                tts(legendaxStr + value, false);
                 vibrate(200);
                 break;
             case FLAG_YLABEL:
-                tts(legendayStr + value);
+                tts(legendayStr + value, false);
                 vibrate(200);
                 break;
             case FLAG_CHARTVALUE:
-                tts("A" + (index + 1) + "ª barra é denominada. " + chartData.getLabels()[index] + " e apresenta valor. " + value);
+                tts("A" + (index + 1) + "ª barra é denominada. " + chartData.getLabels()[index] + " e apresenta valor. " + value, false);
                 vibrate(100);
                 //Do this and this:
                 break;
@@ -780,6 +871,13 @@ public class BarChartActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mSensorManager.registerListener(mShakeHelper, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+        hideSystemUI();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        hideSystemUI();
     }
 
 
@@ -787,6 +885,7 @@ public class BarChartActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         mSensorManager.unregisterListener(mShakeHelper);
+        //textToSpeech.shutdown();
     }
 
 }
