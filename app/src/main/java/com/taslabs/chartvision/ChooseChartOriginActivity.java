@@ -8,21 +8,34 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.mikephil.charting.charts.BarChart;
+import com.taslabs.chartvision.interfaces.IUser;
+import com.taslabs.chartvision.userManager.User;
+import com.taslabs.chartvision.userManager.UserManager;
 
-public class MainActivity extends AppCompatActivity {
-    Button btnBarChart, btnQR, btnNFC, btnLOCAL;
+public class ChooseChartOriginActivity extends AppCompatActivity {
+    Button btnBarChart, btnQR, btnNFC, btnLOCAL, btnRemove;
+    UserManager userManager;
+    IUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_choose_chart_origin);
         BarChart barChart = (BarChart) findViewById(R.id.barchart);
+
+        userManager = UserManager.getInstance(this.getApplicationContext());
+        Bundle extras = getIntent().getExtras();
+        String username = extras.getString("user");
+        user = userManager.getUser(username);
+
+        System.out.println("USUÁRIO ATUAL:" +user.getName());
+
 
         btnBarChart = findViewById(R.id.btnBarChart);
         btnBarChart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent I = new Intent(MainActivity.this, BarChartActivity.class);
+                Intent I = new Intent(ChooseChartOriginActivity.this, BarChartActivity.class);
                 I.putExtra("url", "https://alantas.dev/jsons/frutas.json");
                 startActivity(I);
             }
@@ -32,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         btnQR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent I = new Intent(MainActivity.this, QRScanActivity.class);
+                Intent I = new Intent(ChooseChartOriginActivity.this, QRScanActivity.class);
                 startActivity(I);
             }
         });
@@ -41,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         btnNFC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent I = new Intent(MainActivity.this, NFCActivity.class);
+                Intent I = new Intent(ChooseChartOriginActivity.this, NFCActivity.class);
                 startActivity(I);
             }
         });
@@ -50,8 +63,18 @@ public class MainActivity extends AppCompatActivity {
         btnLOCAL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent I = new Intent(MainActivity.this, LocalFileActivity.class);
+                Intent I = new Intent(ChooseChartOriginActivity.this, LocalFileActivity.class);
                 startActivity(I);
+            }
+        });
+
+        btnRemove = findViewById(R.id.btnRemove);
+        btnRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                userManager.RemoveUser(user);
+                finish();
             }
         });
 

@@ -23,7 +23,7 @@ public class UserManager implements IUserManager {
     private final Context mContext;
     private final SharedPreferences mSharedPref;
     private List<IUser> mUsers = new ArrayList<>();
-    private final int userLimit = 5;
+    private final int userLimit = 4;
 
     public static final String KEY_USERS = "usuarios";
 
@@ -32,37 +32,51 @@ public class UserManager implements IUserManager {
     private UserManager(Context c) {
         mContext = c;
         mSharedPref = c.getSharedPreferences("pref",Context.MODE_PRIVATE);
+        System.out.println("RAW STRING" + mSharedPref.getString(KEY_USERS,""));
         String[] users = mSharedPref.getString(KEY_USERS,"").split(",");
-        for (String user:
-             users) {
-            mUsers.add(getUser(user));
-        }
+            for (String user : users) {
+                if(!user.isEmpty())
+                    mUsers.add(getUser(user));
+            }
+
     }
 
     public static synchronized UserManager getInstance(Context c) {
-        if (userManagerInstance==null)
+        if (userManagerInstance == null)
             userManagerInstance = new UserManager(c);
         return userManagerInstance;
     }
 
-    private IUser getUser(String name) {
+    public IUser getUser(String name) {
        User user = new User();
        user.setName(name);
-       user.setAudioEnabled(Boolean.parseBoolean(mSharedPref.getString(user.KEY_AUDIO,"false")));
-       user.setFontSize(FontSize.valueOf(mSharedPref.getString(user.KEY_FONT_SIZE,FontSize.Medium.toString())));
-       user.setVibrationEnabled(Boolean.parseBoolean(mSharedPref.getString(user.KEY_VIBRATION,"false")));
+       user.setAudioEnabled(Boolean.parseBoolean(mSharedPref.getString(user.KEY_AUDIO,"true")));
+       user.setFontSize(FontSize.valueOf(mSharedPref.getString(user.KEY_FONT_SIZE,FontSize.Small.toString())));
+       user.setVibrationEnabled(Boolean.parseBoolean(mSharedPref.getString(user.KEY_VIBRATION,"true")));
+       user.setHighContrastEnabled(Boolean.parseBoolean(mSharedPref.getString(user.KEY_CONTRAST,"false")));
+       user.setShake2LeaveEnabled(Boolean.parseBoolean(mSharedPref.getString(user.KEY_SHAKE2LEAVE,"true")));
        return user;
     }
 
-
     @Override
     public void SaveUser(IUser user) {
-        if (!user.validadeUser()||mUsers.size()==userLimit) return;
+
+        String userString = "" ;
+        for(int i = 0; i < mUsers.size();i++){
+            userString += " " + mUsers.get(i).getName();
+
+        }
+
+        if (!user.validadeUser()|| mUsers.size()==userLimit || userString.contains(user.getName())) {
+            return;
+        }
+
         String users = mSharedPref.getString(KEY_USERS,"");
-       if (mUsers.size() > 1) {
+       if (mUsers.size() >= 1) {
           users += ",";
        }
         users += user.getName();
+        System.out.println("NEW USERS STRING:" + users);
         final SharedPreferences.Editor sharedPrefEditor = mSharedPref.edit();
         sharedPrefEditor.putString(KEY_USERS,users);
         HashMap<String,String> values = user.getUserData();
@@ -70,12 +84,70 @@ public class UserManager implements IUserManager {
         for (Map.Entry<String, String> pair : values.entrySet()) {
             sharedPrefEditor.putString(user.getName() + pair.getKey(), pair.getValue());
         }
+
         mUsers.add(user);
         sharedPrefEditor.apply();
+    }
+
+
+    @Override
+    public void RemoveUser(IUser user) {
+
+        String users = mSharedPref.getString(KEY_USERS,"");
+        String subStrToRmv = "";
+
+
+        if(mUsers.size() > 1) {
+            if (!mUsers.get(0).getName().equals(user.getName())) {
+                subStrToRmv += ",";
+            }
+
+            subStrToRmv += user.getName();
+
+            if (mUsers.get(0).getName().equals(user.getName())) {
+                subStrToRmv += ",";
+            }
+        }
+
+        else{
+            subStrToRmv += user.getName();
+        }
+
+
+        System.out.println("SUBSTRING TO REMOVE:" + subStrToRmv);
+        System.out.println("ANTES DE REMOVER:" + users);
+        users = users.replace(subStrToRmv, "");
+        System.out.println("DEPOIS DE REMOVER:" + users);
+        final SharedPreferences.Editor sharedPrefEditor = mSharedPref.edit();
+        sharedPrefEditor.putString(KEY_USERS,users);
+
+        HashMap<String,String> values = user.getUserData();
+
+        for (Map.Entry<String, String> pair : values.entrySet()) {
+            sharedPrefEditor.remove(user.getName() + pair.getKey());
+        }
+
+        mUsers.remove(user);
+        sharedPrefEditor.apply();
+    }
+
+    @Override
+    public void EditUser(IUser user) {
+
     }
 
     @Override
     public List<IUser> getUsers() {
       return mUsers;
+    }
+
+    public void update(){
+        mUsers = new ArrayList<>();
+        String[] users = mSharedPref.getString(KEY_USERS,"").split(",");
+        for (String user : users) {
+            if(!user.isEmpty())
+                mUsers.add(getUser(user));
+        }
+
     }
 }

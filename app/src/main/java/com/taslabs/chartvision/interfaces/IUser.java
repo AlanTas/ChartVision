@@ -28,11 +28,17 @@ public interface IUser {
 
      boolean isVibrationEnabled();
 
+     void setHighContrastEnabled(boolean enabled);
+
+     boolean isHighContrastEnabled();
+
+     void setShake2LeaveEnabled(boolean enabled);
+
+     boolean isShake2LeaveEnabled();
+
      boolean validadeUser();
 
      HashMap<String,String> getUserData();
-
-
 
 
 }
