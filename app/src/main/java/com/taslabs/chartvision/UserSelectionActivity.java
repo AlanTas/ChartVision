@@ -297,6 +297,7 @@ public class UserSelectionActivity extends AppCompatActivity {
                     vibrate(50);
                     Intent I = new Intent(UserSelectionActivity.this, ChooseChartOriginActivity.class);
                     I.putExtra("user", users.get(0).getName());
+                    I.putExtra("color", "1");
                     startActivity(I);
                 }
 
@@ -311,6 +312,7 @@ public class UserSelectionActivity extends AppCompatActivity {
                     vibrate(50);
                     Intent I = new Intent(UserSelectionActivity.this, ChooseChartOriginActivity.class);
                     I.putExtra("user", users.get(1).getName());
+                    I.putExtra("color", "2");
                     startActivity(I);
                 }
 
@@ -325,6 +327,7 @@ public class UserSelectionActivity extends AppCompatActivity {
                     vibrate(50);
                     Intent I = new Intent(UserSelectionActivity.this, ChooseChartOriginActivity.class);
                     I.putExtra("user", users.get(2).getName());
+                    I.putExtra("color", "3");
                     startActivity(I);
                 }
 
@@ -339,6 +342,7 @@ public class UserSelectionActivity extends AppCompatActivity {
                     vibrate(50);
                     Intent I = new Intent(UserSelectionActivity.this, ChooseChartOriginActivity.class);
                     I.putExtra("user", users.get(3).getName());
+                    I.putExtra("color", "4");
                     startActivity(I);
                 }
 

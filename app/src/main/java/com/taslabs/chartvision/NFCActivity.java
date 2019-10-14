@@ -22,7 +22,9 @@ import android.speech.tts.TextToSpeech;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.taslabs.chartvision.interfaces.IUser;
 import com.taslabs.chartvision.records.ParsedNdefRecord;
+import com.taslabs.chartvision.userManager.UserManager;
 
 import java.util.List;
 import java.util.Locale;
@@ -35,6 +37,9 @@ public class NFCActivity extends AppCompatActivity {
     TextToSpeech textToSpeech;
     Vibrator v;
 
+    UserManager userManager;
+    IUser user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +47,12 @@ public class NFCActivity extends AppCompatActivity {
         text = (TextView) findViewById(R.id.text);
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+        userManager = UserManager.getInstance(this.getApplicationContext());
+
+        Bundle extras = getIntent().getExtras();
+        String username = extras.getString("user");
+        user = userManager.getUser(username);
 
         if (nfcAdapter == null) {
             Toast.makeText(this, "No NFC", Toast.LENGTH_SHORT).show();
@@ -296,6 +307,7 @@ public class NFCActivity extends AppCompatActivity {
         vibrate(100);
         Intent i = new Intent(NFCActivity.this, BarChartActivity.class);
         i.putExtra("url", intentData);
+        i.putExtra("user", user.getName());
         startActivity(i);
     }
 

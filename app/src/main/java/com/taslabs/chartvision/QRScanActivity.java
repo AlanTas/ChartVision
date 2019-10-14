@@ -30,6 +30,8 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.taslabs.chartvision.interfaces.IUser;
+import com.taslabs.chartvision.userManager.UserManager;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -54,6 +56,9 @@ public class QRScanActivity extends AppCompatActivity {
     private Camera camera = null;
     boolean flashmode=false;
 
+    UserManager userManager;
+    IUser user;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,27 +66,20 @@ public class QRScanActivity extends AppCompatActivity {
         setContentView(R.layout.activity_qrscan);
         initViews();
 
+        userManager = UserManager.getInstance(this.getApplicationContext());
+
+        Bundle extras = getIntent().getExtras();
+        String username = extras.getString("user");
+
+        user = userManager.getUser(username);
+
+
         v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         // ShakeDetector initialization
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         mShakeHelper = new ShakeHelper();
-
-        mShakeHelper.setOnShakeListener(new ShakeHelper.OnShakeListener() {
-
-            @Override
-            public void onShake(int count) {
-                /*
-                 * The following method, "handleShakeEvent(count):" is a stub //
-                 * method you would use to setup whatever you want done once the
-                 * device has been shook.
-                 */
-                if(cameraSource != null){
-                    flashOnButton();
-                }
-            }
-        });
 
     }
 
@@ -91,25 +89,6 @@ public class QRScanActivity extends AppCompatActivity {
     }
 
     private void initialiseDetectorsAndSources() {
-
-        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if (status == TextToSpeech.SUCCESS) {
-                    int res = textToSpeech.setLanguage(new Locale("pt", "BR"));
-                    if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        res = textToSpeech.setLanguage(Locale.getDefault());
-                        if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
-                            res = textToSpeech.setLanguage(Locale.US);
-                            if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
-                            }
-                        }
-                    }
-
-                    tts("Para ligar e desligar o flash, sacuda seu aparelho.");
-                }
-            }
-        });
 
 
         barcodeDetector = new BarcodeDetector.Builder(this)
@@ -161,13 +140,11 @@ public class QRScanActivity extends AppCompatActivity {
                     intentData = barcodes.valueAt(0).displayValue;
                     System.out.println(intentData);
 
-                    tts("QR Detectado");
                     vibrate(100);
                     Intent i = new Intent(QRScanActivity.this, BarChartActivity.class);
                     i.putExtra("url", intentData);
+                    i.putExtra("user", user.getName());
                     startActivity(i);
-
-
                 }
             }
         });
@@ -191,6 +168,8 @@ public class QRScanActivity extends AppCompatActivity {
         super.onPause();
         cameraSource.release();
         mSensorManager.unregisterListener(mShakeHelper);
+        mShakeHelper.setOnShakeListener(null);
+        textToSpeech.shutdown();
     }
 
     @Override
@@ -198,6 +177,40 @@ public class QRScanActivity extends AppCompatActivity {
         super.onResume();
         initialiseDetectorsAndSources();
         mSensorManager.registerListener(mShakeHelper, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+
+        mShakeHelper.setOnShakeListener(new ShakeHelper.OnShakeListener() {
+
+            @Override
+            public void onShake(int count) {
+                /*
+                 * The following method, "handleShakeEvent(count):" is a stub //
+                 * method you would use to setup whatever you want done once the
+                 * device has been shook.
+                 */
+                if(cameraSource != null){
+                    flashOnButton();
+                }
+            }
+        });
+
+        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int res = textToSpeech.setLanguage(new Locale("pt", "BR"));
+                    if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        res = textToSpeech.setLanguage(Locale.getDefault());
+                        if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
+                            res = textToSpeech.setLanguage(Locale.US);
+                            if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
+                            }
+                        }
+                    }
+
+                    tts("Para ligar e desligar o flash, sacuda seu aparelho.");
+                }
+            }
+        });
     }
 
 

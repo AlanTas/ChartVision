@@ -1,6 +1,7 @@
 package com.taslabs.chartvision;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ public class UserSetupActivity extends AppCompatActivity {
     EditText txtNome;
     Button btnSave;
     User newUser;
+    ConstraintLayout constraintLayoutAddUser;
 
 
     @Override
@@ -40,6 +42,9 @@ public class UserSetupActivity extends AppCompatActivity {
         txtNome = findViewById(R.id.txtNome);
         btnSave = findViewById(R.id.btnSave);
 
+        constraintLayoutAddUser =  findViewById(R.id.constraintAddUser);
+        constraintLayoutAddUser.setBackgroundColor(getResources().getColor(R.color.colorBkg));
+
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -49,10 +54,10 @@ public class UserSetupActivity extends AppCompatActivity {
                     newUser = new User();
                     newUser.setName(txtNome.getText().toString());
                     newUser.setFontSize(FontSize.Medium);
-                    newUser.setAudioEnabled(swcTTS.isEnabled());
-                    newUser.setVibrationEnabled(swcVibra.isEnabled());
-                    newUser.setHighContrastEnabled(swcContrast.isEnabled());
-                    newUser.setShake2LeaveEnabled(swcShake.isEnabled());
+                    newUser.setAudioEnabled(swcTTS.isChecked());
+                    newUser.setVibrationEnabled(swcVibra.isChecked());
+                    newUser.setHighContrastEnabled(swcContrast.isChecked());
+                    newUser.setShake2LeaveEnabled(swcShake.isChecked());
                     userManager.SaveUser(newUser);
                     finish();
                 }

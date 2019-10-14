@@ -45,6 +45,8 @@ import java.util.Locale;
 import com.github.mikephil.charting.utils.Utils;
 import com.taslabs.chartvision.JsonParser;
 import com.taslabs.chartvision.enums.FontSize;
+import com.taslabs.chartvision.interfaces.IUser;
+import com.taslabs.chartvision.userManager.UserManager;
 
 public class BarChartActivity extends AppCompatActivity {
     // global variables
@@ -94,6 +96,9 @@ public class BarChartActivity extends AppCompatActivity {
     public boolean vibrateToLeave = true;
     public FontSize fontSize = FontSize.Small;
 
+    UserManager userManager;
+    IUser user;
+
 
 
     @Override
@@ -108,6 +113,14 @@ public class BarChartActivity extends AppCompatActivity {
         constraintLayout = findViewById(R.id.layout);
 
         v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+        userManager = UserManager.getInstance(this.getApplicationContext());
+
+        Bundle extras = getIntent().getExtras();
+        String username = extras.getString("user");
+        user = userManager.getUser(username);
+
+        setUserPrefs();
 
         textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
@@ -157,7 +170,7 @@ public class BarChartActivity extends AppCompatActivity {
         });
 
         JsonParser jsonParser = new JsonParser();
-        Bundle extras = getIntent().getExtras();
+        extras = getIntent().getExtras();
         if (extras != null) {
             if (extras.containsKey("url")) {
                 url = extras.getString("url");
@@ -175,6 +188,22 @@ public class BarChartActivity extends AppCompatActivity {
         chartData = jsonParser.getBarChartObj();
         startListeners();
         stpChart(fontSize, highContrastEnabled);
+
+    }
+
+    private void setUserPrefs() {
+
+        System.out.println("TTS: " + Boolean.toString(user.isAudioEnabled()));
+        System.out.println("Vibration: " + Boolean.toString(user.isVibrationEnabled()));
+        System.out.println("HAPTIC: " + Boolean.toString(user.isShake2LeaveEnabled()));
+        System.out.println("CONTRAST: " + Boolean.toString(user.isHighContrastEnabled()));
+
+        ttsEnabled = user.isAudioEnabled();
+        vibrateToLeave = user.isShake2LeaveEnabled();
+        highContrastEnabled = user.isHighContrastEnabled();
+        hapticEnabled = user.isVibrationEnabled();
+        fontSize = user.getFontSize();
+
 
     }
 

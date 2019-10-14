@@ -50,11 +50,11 @@ public class UserManager implements IUserManager {
     public IUser getUser(String name) {
        User user = new User();
        user.setName(name);
-       user.setAudioEnabled(Boolean.parseBoolean(mSharedPref.getString(user.KEY_AUDIO,"true")));
-       user.setFontSize(FontSize.valueOf(mSharedPref.getString(user.KEY_FONT_SIZE,FontSize.Small.toString())));
-       user.setVibrationEnabled(Boolean.parseBoolean(mSharedPref.getString(user.KEY_VIBRATION,"true")));
-       user.setHighContrastEnabled(Boolean.parseBoolean(mSharedPref.getString(user.KEY_CONTRAST,"false")));
-       user.setShake2LeaveEnabled(Boolean.parseBoolean(mSharedPref.getString(user.KEY_SHAKE2LEAVE,"true")));
+       user.setAudioEnabled(Boolean.parseBoolean(mSharedPref.getString(name + user.KEY_AUDIO,"true")));
+       user.setFontSize(FontSize.valueOf(mSharedPref.getString(name + user.KEY_FONT_SIZE,FontSize.Small.toString())));
+       user.setVibrationEnabled(Boolean.parseBoolean(mSharedPref.getString(name + user.KEY_VIBRATION,"true")));
+       user.setHighContrastEnabled(Boolean.parseBoolean(mSharedPref.getString(name + user.KEY_CONTRAST,"false")));
+       user.setShake2LeaveEnabled(Boolean.parseBoolean(mSharedPref.getString(name + user.KEY_SHAKE2LEAVE,"true")));
        return user;
     }
 
@@ -149,5 +149,14 @@ public class UserManager implements IUserManager {
                 mUsers.add(getUser(user));
         }
 
+    }
+
+    public void printWholeSharedPrefs(){
+
+    Map<String,?> keys = mSharedPref.getAll();
+    for(Map.Entry<String,?> entry : keys.entrySet()){
+        System.out.println( entry.getKey() + ": " +
+                entry.getValue().toString());
+    }
     }
 }
