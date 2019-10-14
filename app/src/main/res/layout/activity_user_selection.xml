@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/contraintUserSelection"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal"
+    tools:context=".UserSelectionActivity">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/User1"
+        android:layout_width="150dp"
+        android:layout_height="180dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2">
+
+        <TextView
+            android:id="@+id/txtInicial1"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:fontFamily="sans-serif-black"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="A"
+            android:textAllCaps="true"
+            android:textSize="100sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textUserName1"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="Alan Tas"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtInicial1" />
+
+        <ImageView
+            android:id="@+id/addOnFirst"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/txtInicial1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/txtInicial1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_add" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/User2"
+        android:layout_width="150dp"
+        android:layout_height="180dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="@+id/guideline2">
+
+        <TextView
+            android:id="@+id/txtInicial2"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:fontFamily="sans-serif-black"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="A"
+            android:textAllCaps="true"
+            android:textSize="100sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textUserName2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="Alan Tas"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtInicial2" />
+
+        <ImageView
+            android:id="@+id/addOnSecond"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/txtInicial2"
+            app:layout_constraintEnd_toEndOf="@+id/txtInicial2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/txtInicial2"
+            app:srcCompat="@drawable/ic_add" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/User3"
+        android:layout_width="150dp"
+        android:layout_height="180dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="@+id/guideline">
+
+        <TextView
+            android:id="@+id/txtInicial3"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:fontFamily="sans-serif-black"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="A"
+            android:textAllCaps="true"
+            android:textSize="100sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textUserName3"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="Alan Tas"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtInicial3" />
+
+        <ImageView
+            android:id="@+id/addOnThird"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/txtInicial3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/txtInicial3"
+            app:layout_constraintTop_toTopOf="@+id/txtInicial3"
+            app:srcCompat="@drawable/ic_add" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/User4"
+        android:layout_width="150dp"
+        android:layout_height="180dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="@+id/guideline">
+
+        <TextView
+            android:id="@+id/txtInicial4"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:fontFamily="sans-serif-black"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="A"
+            android:textAllCaps="true"
+            android:textSize="100sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textUserName4"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="Alan Tas"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtInicial4" />
+
+        <ImageView
+            android:id="@+id/addOnFourth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/txtInicial4"
+            app:layout_constraintEnd_toEndOf="@+id/txtInicial4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_add" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="331dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

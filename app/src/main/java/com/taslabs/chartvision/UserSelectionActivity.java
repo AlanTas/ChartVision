@@ -6,6 +6,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -13,6 +15,7 @@ import android.os.Vibrator;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.taslabs.chartvision.interfaces.IUser;
@@ -26,11 +29,10 @@ public class UserSelectionActivity extends AppCompatActivity {
 
     UserManager userManager;
     public List<IUser> users;
-    TextView userNames;
-    Button addUsers;
 
 
     TextView txtInicial1, txtInicial2, txtInicial3, txtInicial4, txtName1, txtName2, txtName3, txtName4;
+    ImageView on1st, on2nd, on3rd, on4th;
 
     List<TextView> usuario1 = new ArrayList<>();
     List<TextView> usuario2 = new ArrayList<>();
@@ -46,27 +48,14 @@ public class UserSelectionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_selection);
 
-        userNames = findViewById(R.id.txtUsers);
-        addUsers = findViewById(R.id.btnAddUser);
+
+        findViewById(R.id.contraintUserSelection).setBackgroundColor(getResources().getColor(R.color.colorBkg));
 
 
         v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         getSquares();
 
 
-
-
-        addUsers.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                addUsers.setEnabled(false);
-
-                Intent i = new Intent(UserSelectionActivity.this, UserSetupActivity.class);
-                startActivity(i);
-
-            }
-        });
     }
 
     private void getUsers() {
@@ -81,15 +70,6 @@ public class UserSelectionActivity extends AppCompatActivity {
         super.onResume();
 
         getUsers();
-        addUsers.setEnabled(true);
-
-        String userString = "" ;
-        for(int i = 0; i < users.size();i++){
-            userString += " " + users.get(i).getName().toString();
-
-        }
-
-        userNames.setText(userString);
 
         for(int i = 0; i < fieldsFilled.size(); i++){
             fieldsFilled.set(i, false);
@@ -102,6 +82,105 @@ public class UserSelectionActivity extends AppCompatActivity {
 
         setupUserSquares();
         setupListeners();
+        setupAddButton();
+        setupAddListener();
+
+
+    }
+
+    private void setupAddListener() {
+    }
+
+    private void setupAddButton() {
+
+        final ConstraintLayout layoutUser1 = findViewById(R.id.User1);
+        final ConstraintLayout layoutUser2 = findViewById(R.id.User2);
+        final ConstraintLayout layoutUser3 = findViewById(R.id.User3);
+        final ConstraintLayout layoutUser4 = findViewById(R.id.User4);
+
+        int tamanho = users.size();
+
+        on1st.setVisibility(View.INVISIBLE);
+        on2nd.setVisibility(View.INVISIBLE);
+        on3rd.setVisibility(View.INVISIBLE);
+        on4th.setVisibility(View.INVISIBLE);
+
+        if (tamanho == 4){
+
+        }
+
+        else if(tamanho == 3){
+            on4th.setVisibility(View.VISIBLE);
+            txtName4.setVisibility(View.VISIBLE);
+            txtName4.setText("Adicionar Usuário");
+
+            layoutUser4.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                        layoutUser4.setOnClickListener(null);
+                        vibrate(50);
+                        Intent I = new Intent(UserSelectionActivity.this, UserSetupActivity.class);
+                        startActivity(I);
+
+                }
+            });
+
+        }
+
+        else if(tamanho == 2){
+            on3rd.setVisibility(View.VISIBLE);
+            txtName3.setVisibility(View.VISIBLE);
+            txtName3.setText("Adicionar Usuário");
+
+            layoutUser3.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    layoutUser3.setOnClickListener(null);
+                    vibrate(50);
+                    Intent I = new Intent(UserSelectionActivity.this, UserSetupActivity.class);
+                    startActivity(I);
+
+                }
+            });
+        }
+
+        else if(tamanho == 1){
+            on2nd.setVisibility(View.VISIBLE);
+            txtName2.setVisibility(View.VISIBLE);
+            txtName2.setText("Adicionar Usuário");
+
+            layoutUser2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    layoutUser2.setOnClickListener(null);
+                    vibrate(50);
+                    Intent I = new Intent(UserSelectionActivity.this, UserSetupActivity.class);
+                    startActivity(I);
+
+                }
+            });
+        }
+
+        else if(tamanho == 0){
+            on1st.setVisibility(View.VISIBLE);
+            txtName1.setVisibility(View.VISIBLE);
+            txtName1.setText("Adicionar Usuário");
+
+            layoutUser1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    layoutUser1.setOnClickListener(null);
+                    vibrate(50);
+                    Intent I = new Intent(UserSelectionActivity.this, UserSetupActivity.class);
+                    startActivity(I);
+
+                }
+            });
+        }
 
 
     }
@@ -115,6 +194,22 @@ public class UserSelectionActivity extends AppCompatActivity {
         txtName2 = findViewById(R.id.textUserName2);
         txtName3 = findViewById(R.id.textUserName3);
         txtName4 = findViewById(R.id.textUserName4);
+
+        txtInicial1.setTextColor(Color.parseColor("#000000"));
+        txtInicial2.setTextColor(Color.parseColor("#000000"));
+        txtInicial3.setTextColor(Color.parseColor("#000000"));
+        txtInicial4.setTextColor(Color.parseColor("#000000"));
+
+        txtName1.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+        txtName2.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+        txtName3.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+        txtName4.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+
+        txtName1.setTextColor(Color.parseColor("#FFFFFF"));
+        txtName2.setTextColor(Color.parseColor("#FFFFFF"));
+        txtName3.setTextColor(Color.parseColor("#FFFFFF"));
+        txtName4.setTextColor(Color.parseColor("#FFFFFF"));
+
 
 
         usuario1.add(txtInicial1);
@@ -135,15 +230,22 @@ public class UserSelectionActivity extends AppCompatActivity {
         fieldsFilled.add(false);
         fieldsFilled.add(false);
         fieldsFilled.add(false);
+
+        on1st = findViewById(R.id.addOnFirst);
+        on2nd = findViewById(R.id.addOnSecond);
+        on3rd = findViewById(R.id.addOnThird);
+        on4th = findViewById(R.id.addOnFourth);
+
+
     }
 
     public void setupUserSquares(){
 
 
-        txtInicial1.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-        txtInicial2.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-        txtInicial3.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-        txtInicial4.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+        txtInicial1.setBackgroundColor(getResources().getColor(R.color.colorFirstUser));
+        txtInicial2.setBackgroundColor(getResources().getColor(R.color.colorSecondUser));
+        txtInicial3.setBackgroundColor(getResources().getColor(R.color.colorThirdUser));
+        txtInicial4.setBackgroundColor(getResources().getColor(R.color.colorForthUser));
 
         for(int i = 0; i < users.size(); i++){
 
