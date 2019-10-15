@@ -1,6 +1,7 @@
 package com.taslabs.chartvision;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -160,8 +161,9 @@ public class BarChartActivity extends AppCompatActivity {
                      * method you would use to setup whatever you want done once the
                      * device has been shook.
                      */
-
-                    tts("Saindo. Por favor, re-ligue o recurso Tólque Béque", true);
+                    if(ttsEnabled) {
+                        tts("Saindo. Por favor, re-ligue o Tólque Béque", true);
+                    }
 
                     //textToSpeech.stop();
                     finish();
@@ -197,6 +199,7 @@ public class BarChartActivity extends AppCompatActivity {
         System.out.println("Vibration: " + Boolean.toString(user.isVibrationEnabled()));
         System.out.println("HAPTIC: " + Boolean.toString(user.isShake2LeaveEnabled()));
         System.out.println("CONTRAST: " + Boolean.toString(user.isHighContrastEnabled()));
+        System.out.println("FONT SIZE: " + user.getFontSize().toString());
 
         ttsEnabled = user.isAudioEnabled();
         vibrateToLeave = user.isShake2LeaveEnabled();
@@ -916,5 +919,16 @@ public class BarChartActivity extends AppCompatActivity {
         mSensorManager.unregisterListener(mShakeHelper);
         //textToSpeech.shutdown();
     }
+
+    @Override
+    public void onBackPressed() {
+        if(ttsEnabled) {
+            tts("Saindo. Por favor, re-ligue o Tólque Béque", true);
+        }
+
+        super.onBackPressed();
+
+    }
+
 
 }

@@ -4,8 +4,8 @@ import java.util.List;
 
 public interface IUserManager {
 
-   void SaveUser(IUser user);
+   boolean SaveUser(IUser user);
    void RemoveUser(IUser user);
-   void EditUser(IUser user);
+   boolean EditUser(IUser oldUser, IUser newUser);
    List<IUser> getUsers();
 }

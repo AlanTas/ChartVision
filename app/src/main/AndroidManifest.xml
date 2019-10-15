@@ -21,7 +21,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".UserSetupActivity"></activity>
+        <activity android:name=".UserSetingsActivity"></activity>
+        <activity android:name=".UserSetupActivity" />
         <activity android:name=".UserSelectionActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,7 +37,7 @@
             android:name=".BarChartActivity"
             android:screenOrientation="landscape"
             android:theme="@style/BarChart" />
-        <activity android:name=".ChooseChartOriginActivity"></activity>
+        <activity android:name=".ChooseChartOriginActivity" />
     </application>
 
 </manifest>

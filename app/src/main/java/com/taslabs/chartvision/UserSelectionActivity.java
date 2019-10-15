@@ -121,6 +121,7 @@ public class UserSelectionActivity extends AppCompatActivity {
                         layoutUser4.setOnClickListener(null);
                         vibrate(50);
                         Intent I = new Intent(UserSelectionActivity.this, UserSetupActivity.class);
+                        I.putExtra("type", false);
                         startActivity(I);
 
                 }
@@ -140,6 +141,7 @@ public class UserSelectionActivity extends AppCompatActivity {
                     layoutUser3.setOnClickListener(null);
                     vibrate(50);
                     Intent I = new Intent(UserSelectionActivity.this, UserSetupActivity.class);
+                    I.putExtra("type", false);
                     startActivity(I);
 
                 }
@@ -158,6 +160,7 @@ public class UserSelectionActivity extends AppCompatActivity {
                     layoutUser2.setOnClickListener(null);
                     vibrate(50);
                     Intent I = new Intent(UserSelectionActivity.this, UserSetupActivity.class);
+                    I.putExtra("type", false);
                     startActivity(I);
 
                 }
@@ -176,6 +179,7 @@ public class UserSelectionActivity extends AppCompatActivity {
                     layoutUser1.setOnClickListener(null);
                     vibrate(50);
                     Intent I = new Intent(UserSelectionActivity.this, UserSetupActivity.class);
+                    I.putExtra("type", false);
                     startActivity(I);
 
                 }

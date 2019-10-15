@@ -309,6 +309,7 @@ public class NFCActivity extends AppCompatActivity {
         i.putExtra("url", intentData);
         i.putExtra("user", user.getName());
         startActivity(i);
+        finish();
     }
 
 }

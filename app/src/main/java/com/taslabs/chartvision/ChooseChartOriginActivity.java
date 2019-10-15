@@ -1,6 +1,7 @@
 package com.taslabs.chartvision;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -14,8 +15,15 @@ import com.taslabs.chartvision.interfaces.IUser;
 import com.taslabs.chartvision.userManager.User;
 import com.taslabs.chartvision.userManager.UserManager;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 public class ChooseChartOriginActivity extends AppCompatActivity {
-    Button btnBarChart, btnQR, btnNFC, btnLOCAL, btnRemove, btnConfig;
+    final int PICKFILE_RESULT_CODE = 0;
+    Button btnQR, btnNFC, btnLOCAL, btnConfig;
     TextView siglaNome;
     UserManager userManager;
     IUser user;
@@ -38,27 +46,33 @@ public class ChooseChartOriginActivity extends AppCompatActivity {
         chooseConstraint = findViewById(R.id.constraintOrigin);
         chooseConstraint.setBackgroundColor(getResources().getColor(R.color.colorBkg));
 
-        System.out.println("USUÁRIO ATUAL:" +user.getName());
+        System.out.println("USUÁRIO ATUAL:" + user.getName());
 
-
-//        btnBarChart = findViewById(R.id.btnBarChart);
-//        btnBarChart.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent I = new Intent(ChooseChartOriginActivity.this, BarChartActivity.class);
-//                I.putExtra("url", "https://alantas.dev/jsons/frutas.json");
-//                startActivity(I);
-//            }
-//        });
 
         layoutUser = findViewById(R.id.constraintUserBox);
         layoutUser.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+
+
         btnConfig = findViewById(R.id.btnConfigs);
+        btnConfig.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btnConfig.setEnabled(false);
+                Intent I = new Intent(ChooseChartOriginActivity.this, UserSetupActivity.class);
+                I.putExtra("type", true);
+                I.putExtra("color", color);
+                I.putExtra("user", user.getName());
+                startActivity(I);
+                finish();
+            }
+        });
+
 
         btnQR = findViewById(R.id.btnQR);
         btnQR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                btnQR.setEnabled(false);
                 Intent I = new Intent(ChooseChartOriginActivity.this, QRScanActivity.class);
                 I.putExtra("user", user.getName());
                 startActivity(I);
@@ -69,6 +83,7 @@ public class ChooseChartOriginActivity extends AppCompatActivity {
         btnNFC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                btnNFC.setEnabled(false);
                 Intent I = new Intent(ChooseChartOriginActivity.this, NFCActivity.class);
                 I.putExtra("user", user.getName());
                 startActivity(I);
@@ -79,25 +94,59 @@ public class ChooseChartOriginActivity extends AppCompatActivity {
         btnLOCAL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent I = new Intent(ChooseChartOriginActivity.this, LocalFileActivity.class);
-                I.putExtra("user", user.getName());
-                startActivity(I);
-            }
-        });
+                btnLOCAL.setEnabled(false);
 
-        btnRemove = findViewById(R.id.btnRemove);
-        btnRemove.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+                Intent fileintent = new Intent(Intent.ACTION_GET_CONTENT);
+                fileintent.setType("application/octet-stream");
+                startActivityForResult(fileintent, PICKFILE_RESULT_CODE);
 
-                userManager.RemoveUser(user);
-                finish();
             }
         });
 
         setButtonColors();
 
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == PICKFILE_RESULT_CODE)
+        {
+            Uri uri = intent.getData();
+
+            String type = intent.getType();
+            System.out.println("Pick completed: "+ uri + " "+type);
+            if (uri != null)
+            {
+                try {
+                    InputStream inputStream = getContentResolver().openInputStream(uri);
+
+                    BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line + "\n");
+                    }
+                    br.close();
+                    System.out.println("OUTPUT");
+                    System.out.println(sb.toString());
+
+                    String intentData = sb.toString();
+                    Intent i = new Intent(ChooseChartOriginActivity.this, BarChartActivity.class);
+                    i.putExtra("user", user.getName());
+                    i.putExtra("json", intentData);
+                    startActivity(i);
+
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     private void setButtonColors() {
@@ -126,11 +175,20 @@ public class ChooseChartOriginActivity extends AppCompatActivity {
         }
 
         else if (color.equals("4")){
-            btnBarChart.setBackgroundColor(getResources().getColor(R.color.colorForthUser));
             btnLOCAL.setBackgroundColor(getResources().getColor(R.color.colorForthUser));
             btnNFC.setBackgroundColor(getResources().getColor(R.color.colorForthUser));
             btnQR.setBackgroundColor(getResources().getColor(R.color.colorForthUser));
             btnConfig.setBackgroundColor(getResources().getColor(R.color.colorForthUser));
         }
+    }
+
+    @Override
+
+    public void onResume(){
+        super.onResume();
+        btnConfig.setEnabled(true);
+        btnQR.setEnabled(true);
+        btnNFC.setEnabled(true);
+        btnLOCAL.setEnabled(true);
     }
 }

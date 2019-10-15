@@ -145,6 +145,7 @@ public class QRScanActivity extends AppCompatActivity {
                     i.putExtra("url", intentData);
                     i.putExtra("user", user.getName());
                     startActivity(i);
+                    finish();
                 }
             }
         });

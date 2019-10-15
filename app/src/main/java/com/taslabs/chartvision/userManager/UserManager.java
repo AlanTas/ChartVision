@@ -2,6 +2,7 @@ package com.taslabs.chartvision.userManager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
 import com.taslabs.chartvision.enums.FontSize;
 import com.taslabs.chartvision.interfaces.IUser;
@@ -59,7 +60,7 @@ public class UserManager implements IUserManager {
     }
 
     @Override
-    public void SaveUser(IUser user) {
+    public boolean SaveUser(IUser user) {
 
         String userString = "" ;
         for(int i = 0; i < mUsers.size();i++){
@@ -67,8 +68,13 @@ public class UserManager implements IUserManager {
 
         }
 
-        if (!user.validadeUser()|| mUsers.size()==userLimit || userString.contains(user.getName())) {
-            return;
+        if (!user.validadeUser()|| mUsers.size()==userLimit) {
+            return false;
+        }
+
+        if (userString.contains(user.getName())){
+            Toast.makeText(mContext, "Usuário com esse nome já existe", Toast.LENGTH_LONG).show();
+            return false;
         }
 
         String users = mSharedPref.getString(KEY_USERS,"");
@@ -87,6 +93,7 @@ public class UserManager implements IUserManager {
 
         mUsers.add(user);
         sharedPrefEditor.apply();
+        return true;
     }
 
 
@@ -132,8 +139,42 @@ public class UserManager implements IUserManager {
     }
 
     @Override
-    public void EditUser(IUser user) {
+    public boolean EditUser(IUser oldUser, IUser newUser) {
 
+        String users = mSharedPref.getString(KEY_USERS,"");
+
+
+        if (!newUser.validadeUser()|| users.contains(newUser.getName())){
+            if(oldUser.getName().equals(newUser.getName())){
+
+            }
+            else {
+                Toast.makeText(mContext, "Usuário com esse nome já existe", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        }
+
+        users = users.replace(oldUser.getName(), newUser.getName());
+
+        final SharedPreferences.Editor sharedPrefEditor = mSharedPref.edit();
+        sharedPrefEditor.putString(KEY_USERS,users);
+
+        HashMap<String,String> values = oldUser.getUserData();
+
+        for (Map.Entry<String, String> pair : values.entrySet()) {
+            sharedPrefEditor.remove(oldUser.getName() + pair.getKey());
+        }
+
+        values = newUser.getUserData();
+
+        for (Map.Entry<String, String> pair : values.entrySet()) {
+            sharedPrefEditor.putString(newUser.getName() + pair.getKey(), pair.getValue());
+        }
+
+        mUsers.remove(oldUser);
+        mUsers.add(newUser);
+        sharedPrefEditor.apply();
+        return true;
     }
 
     @Override
