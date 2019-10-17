@@ -42,12 +42,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 public class GroupedBarChartActivity extends AppCompatActivity {
     // global variables
     protected static Entry entra;
     protected static int index;
     protected static Highlight higha;
+
+    Random rnd = new Random();
 
     TextToSpeech textToSpeech;
     BarChart chart;
@@ -207,51 +210,47 @@ public class GroupedBarChartActivity extends AppCompatActivity {
 
     public void stpChart(FontSize fontSize, boolean highContrastEnabled){
 
+
+        final List<String> groups = new ArrayList<String>();
+        groups.add("Norte");
+        groups.add("Nordeste");
+        groups.add("Sul");
+
+        List<String> series = new ArrayList<String>();
+        series.add("Ens. Médio");
+        series.add("Ens. Sup");
+        series.add("Pós Grad");
+
+
+        List<List> values = new ArrayList<>();
+        values.add(Arrays.asList(450, 324, 213));
+        values.add(Arrays.asList(102, 87, 78));
+        values.add(Arrays.asList(30, 40, 50));
+
+
+        titulo.setText("Número de estudantes por nível escolar em regiões do Brasil");
+        xlabel.setText("Regiões");
+        ylabel.setText("Número de estudantes em milhares");
+
+
+
         XAxis xAxis = chart.getXAxis();
 
         @ColorInt int colorBackground = Color.parseColor("#000000");
         @ColorInt int colorFont = Color.parseColor("#ffff00");
         @ColorInt int colorBars = Color.parseColor("#00ff00");
 
-//        // Carregando dados do gráfico
-//        titulo.setText(chartData.getTitle());
-//        xlabel.setText(chartData.getxLabel());
-//        ylabel.setText(chartData.getyLabel());
-
-        // Get values from object
-//        List<BarEntry> entries = new ArrayList<>();
-//        int lenght = chartData.getLabels().length;
-//
-//        for(int i = 0; i < lenght; i++){
-//            entries.add(new BarEntry((float)i, (float)chartData.getValues()[i]));
-//
-//        }
         XAxis xl = chart.getXAxis();
         xl.setGranularity(1f);
         xl.setCenterAxisLabels(true);
         xl.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                String retorno = null;
+                String retorno = "";
 
-                if (value == 0f){
-                    retorno = "Norte";
+                if(value < groups.size() && value >= 0) {
+                    retorno = groups.get((int)value);
                 }
-
-                else if (value == 1f){
-                    retorno = "Nordeste";
-                }
-
-                else if (value == 2f){
-                    retorno = "Sul";
-                }
-
-                else{
-                    retorno = "";
-                }
-
-
-
                 return retorno;
             }
         });
@@ -272,44 +271,29 @@ public class GroupedBarChartActivity extends AppCompatActivity {
         //data
         float groupSpace = 0.15f;
         float barSpace = 0.02f; // x2 dataset
-        float barWidth = 0.263333f; // x2 dataset
+        float barWidth = (1 - groupSpace - barSpace*series.size()) / series.size();
+
         // (0.46 + 0.02) * 2 + 0.04 = 1.00 -> interval per "group"
 
-        int startYear = 1980;
-        int endYear = 1982;
+        List<List> listaSeries = new ArrayList<List>();
 
+        for(int i = 0; i < values.size(); i++){
+            List<BarEntry> temp = new ArrayList<BarEntry>();
+            for(int j = 0; j < values.get(i).size(); j++){
+                temp.add(new BarEntry(j, (int)values.get(i).get(j)));
+            }
+            listaSeries.add(temp);
+        }
 
-        List<BarEntry> medio = new ArrayList<BarEntry>();
-        List<BarEntry> sup = new ArrayList<BarEntry>();
-        List<BarEntry> pos = new ArrayList<BarEntry>();
-
-        medio.add(new BarEntry(0, 450f));
-        medio.add(new BarEntry(1, 324f));
-        medio.add(new BarEntry(2, 213f));
-
-        sup.add(new BarEntry(0, 102f));
-        sup.add(new BarEntry(1, 87f));
-        sup.add(new BarEntry(2, 78f));
-
-        pos.add(new BarEntry(0, 30f));
-        pos.add(new BarEntry(1, 40f));
-        pos.add(new BarEntry(2, 50f));
-
-
-        BarDataSet set1, set2, set3;
-
-        // create 2 datasets with different types
-        set1 = new BarDataSet(medio, "Medio");
-        set1.setColor(Color.rgb(104, 241, 175));
-        set2 = new BarDataSet(sup, "Superior");
-        set2.setColor(Color.rgb(164, 228, 251));
-        set3 = new BarDataSet(pos, "Pós");
-        set3.setColor(Color.rgb(100, 200, 251));
 
         ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
-        dataSets.add(set1);
-        dataSets.add(set2);
-        dataSets.add(set3);
+        for(int i = 0; i < listaSeries.size(); i++){
+
+            BarDataSet set = new BarDataSet(listaSeries.get(i), series.get(i));
+            set.setColor(Color.rgb(rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)));
+            dataSets.add(set);
+
+        }
 
         BarData data = new BarData(dataSets);
         chart.setData(data);
@@ -317,7 +301,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
 
         chart.getBarData().setBarWidth(barWidth);
         chart.getXAxis().setAxisMinValue(0);
-        chart.getXAxis().setAxisMaximum(3);
+        chart.getXAxis().setAxisMaximum(groups.size());
         chart.getLegend().setTextColor(Color.parseColor("#FFFFFF"));
         chart.groupBars(0, groupSpace, barSpace);
         chart.invalidate();
