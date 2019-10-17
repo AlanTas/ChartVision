@@ -1,9 +1,8 @@
 package com.taslabs.chartvision;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.hardware.Sensor;
@@ -14,18 +13,16 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.ColorInt;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.Chart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -33,23 +30,20 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.github.mikephil.charting.highlight.ChartHighlighter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.github.mikephil.charting.utils.ColorTemplate;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
-import com.github.mikephil.charting.utils.Utils;
-import com.taslabs.chartvision.JsonParser;
 import com.taslabs.chartvision.enums.FontSize;
 import com.taslabs.chartvision.interfaces.IUser;
 import com.taslabs.chartvision.userManager.UserManager;
 
-public class BarChartActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+
+public class GroupedBarChartActivity extends AppCompatActivity {
     // global variables
     protected static Entry entra;
     protected static int index;
@@ -105,13 +99,13 @@ public class BarChartActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bar_chart);
-        chart = findViewById(R.id.barchart);
+        setContentView(R.layout.activity_grouped_bar_chart);
+        chart = findViewById(R.id.groupedbarchart);
 
-        titulo = findViewById(R.id.title);
-        xlabel = findViewById(R.id.xlabel);
-        ylabel = findViewById(R.id.ylabel);
-        constraintLayout = findViewById(R.id.layout);
+        titulo = findViewById(R.id.groupedtitle);
+        xlabel = findViewById(R.id.groupedxlabel);
+        ylabel = findViewById(R.id.groupedylabel);
+        constraintLayout = findViewById(R.id.groupedlayout);
 
         v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
@@ -123,7 +117,7 @@ public class BarChartActivity extends AppCompatActivity {
 
         setUserPrefs();
 
-        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+        textToSpeech = new TextToSpeech(this, new OnInitListener() {
             @Override
             public void onInit(int status) {
                 if (status == TextToSpeech.SUCCESS) {
@@ -219,43 +213,130 @@ public class BarChartActivity extends AppCompatActivity {
         @ColorInt int colorFont = Color.parseColor("#ffff00");
         @ColorInt int colorBars = Color.parseColor("#00ff00");
 
-        // Carregando dados do gráfico
-        titulo.setText(chartData.getTitle());
-        xlabel.setText(chartData.getxLabel());
-        ylabel.setText(chartData.getyLabel());
+//        // Carregando dados do gráfico
+//        titulo.setText(chartData.getTitle());
+//        xlabel.setText(chartData.getxLabel());
+//        ylabel.setText(chartData.getyLabel());
 
         // Get values from object
-        List<BarEntry> entries = new ArrayList<>();
-        int lenght = chartData.getLabels().length;
+//        List<BarEntry> entries = new ArrayList<>();
+//        int lenght = chartData.getLabels().length;
+//
+//        for(int i = 0; i < lenght; i++){
+//            entries.add(new BarEntry((float)i, (float)chartData.getValues()[i]));
+//
+//        }
+        XAxis xl = chart.getXAxis();
+        xl.setGranularity(1f);
+        xl.setCenterAxisLabels(true);
+        xl.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                String retorno = null;
 
-        for(int i = 0; i < lenght; i++){
-            entries.add(new BarEntry((float)i, (float)chartData.getValues()[i]));
+                if (value == 0f){
+                    retorno = "Norte";
+                }
 
-        }
+                else if (value == 1f){
+                    retorno = "Nordeste";
+                }
 
-        BarDataSet set = new BarDataSet(entries, "BarDataSet");
-        if(this.highContrastEnabled){
-            set.setColor(colorBars);
-        }
-        BarData data = new BarData(set);
+                else if (value == 2f){
+                    retorno = "Sul";
+                }
+
+                else{
+                    retorno = "";
+                }
+
+
+
+                return retorno;
+            }
+        });
+
+        YAxis leftAxis = chart.getAxisLeft();
+        leftAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return String.valueOf((int) value);
+            }
+
+        });
+        leftAxis.setDrawGridLines(false);
+        //leftAxis.setSpaceTop(30f);
+        leftAxis.setAxisMinValue(0f); // this replaces setStartAtZero(true
+        chart.getAxisRight().setEnabled(false);
+
+        //data
+        float groupSpace = 0.15f;
+        float barSpace = 0.02f; // x2 dataset
+        float barWidth = 0.263333f; // x2 dataset
+        // (0.46 + 0.02) * 2 + 0.04 = 1.00 -> interval per "group"
+
+        int startYear = 1980;
+        int endYear = 1982;
+
+
+        List<BarEntry> medio = new ArrayList<BarEntry>();
+        List<BarEntry> sup = new ArrayList<BarEntry>();
+        List<BarEntry> pos = new ArrayList<BarEntry>();
+
+        medio.add(new BarEntry(0, 450f));
+        medio.add(new BarEntry(1, 324f));
+        medio.add(new BarEntry(2, 213f));
+
+        sup.add(new BarEntry(0, 102f));
+        sup.add(new BarEntry(1, 87f));
+        sup.add(new BarEntry(2, 78f));
+
+        pos.add(new BarEntry(0, 30f));
+        pos.add(new BarEntry(1, 40f));
+        pos.add(new BarEntry(2, 50f));
+
+
+        BarDataSet set1, set2, set3;
+
+        // create 2 datasets with different types
+        set1 = new BarDataSet(medio, "Medio");
+        set1.setColor(Color.rgb(104, 241, 175));
+        set2 = new BarDataSet(sup, "Superior");
+        set2.setColor(Color.rgb(164, 228, 251));
+        set3 = new BarDataSet(pos, "Pós");
+        set3.setColor(Color.rgb(100, 200, 251));
+
+        ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
+        dataSets.add(set1);
+        dataSets.add(set2);
+        dataSets.add(set3);
+
+        BarData data = new BarData(dataSets);
         chart.setData(data);
 
-        // Configurações gerais do gráfico
+
+        chart.getBarData().setBarWidth(barWidth);
+        chart.getXAxis().setAxisMinValue(0);
+        chart.getXAxis().setAxisMaximum(3);
+        chart.getLegend().setTextColor(Color.parseColor("#FFFFFF"));
+        chart.groupBars(0, groupSpace, barSpace);
+        chart.invalidate();
+
+
+
+
+        //Configurações gerais do gráfico
         chart.setFitBars(true); // make the x-axis fit exactly all bars
         chart.invalidate(); // refresh
         chart.setDoubleTapToZoomEnabled(false);
         chart.setPinchZoom(false);
         chart.getAxisLeft().setDrawGridLines(false);
-        chart.getLegend().setEnabled(false); //Desabilita a legenda
         chart.setScaleEnabled(false); // Disable all zooming
         chart.getXAxis().setDrawGridLines(false);
         chart.getDescription().setEnabled(false);
         chart.getAxisLeft().setDrawGridLines(false);
         chart.getAxisRight().setDrawGridLines(false);
         chart.getAxisRight().setEnabled(false);
-        String[] labels = chartData.getLabels();
-        xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
-        xAxis.setLabelCount(lenght);
         xAxis.setDrawGridLines(false);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 

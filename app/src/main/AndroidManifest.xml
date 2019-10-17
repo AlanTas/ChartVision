@@ -37,6 +37,10 @@
             android:name=".BarChartActivity"
             android:screenOrientation="landscape"
             android:theme="@style/BarChart" />
+        <activity
+            android:name=".GroupedBarChartActivity"
+            android:screenOrientation="landscape"
+            android:theme="@style/BarChart" />
         <activity android:name=".ChooseChartOriginActivity" />
     </application>
 

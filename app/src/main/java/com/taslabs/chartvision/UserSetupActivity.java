@@ -99,12 +99,14 @@ public class UserSetupActivity extends AppCompatActivity {
 
     public void isNewUser(){
 
+        swcTTS.setChecked(true);
+
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
 
-                if(txtNome.getText().toString().trim().length() != 0) {
+                if(txtNome.getText().toString().trim().length() != 0 && !txtNome.getText().toString().contains(",")) {
                     newUser = new User();
                     newUser.setName(txtNome.getText().toString());
                     newUser.setFontSize(getFontSize());
@@ -120,6 +122,10 @@ public class UserSetupActivity extends AppCompatActivity {
 
                 else {
                     Toast.makeText(getApplicationContext(), "O campo 'Nome' não pode ficar vazio", Toast.LENGTH_LONG).show();
+                }
+
+                if(txtNome.getText().toString().contains(",")){
+                    Toast.makeText(getApplicationContext(), "O campo 'Nome' não pode conter vírgulas", Toast.LENGTH_LONG).show();
                 }
 
             }
@@ -173,7 +179,7 @@ public class UserSetupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(txtNome.getText().toString().trim().length() != 0) {
+                if(txtNome.getText().toString().trim().length() != 0  && !txtNome.getText().toString().contains(",")) {
                     newUser = new User();
                     newUser.setName(txtNome.getText().toString());
                     newUser.setFontSize(getFontSize());
@@ -191,6 +197,14 @@ public class UserSetupActivity extends AppCompatActivity {
                         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
 
                     }
+                }
+
+                else {
+                    Toast.makeText(getApplicationContext(), "O campo 'Nome' não pode ficar vazio", Toast.LENGTH_LONG).show();
+                }
+
+                if(txtNome.getText().toString().contains(",")){
+                    Toast.makeText(getApplicationContext(), "O campo 'Nome' não pode conter vírgulas", Toast.LENGTH_LONG).show();
                 }
 
             }

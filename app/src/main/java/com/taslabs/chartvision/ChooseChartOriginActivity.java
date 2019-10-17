@@ -12,7 +12,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.taslabs.chartvision.interfaces.IUser;
-import com.taslabs.chartvision.userManager.User;
 import com.taslabs.chartvision.userManager.UserManager;
 
 import java.io.BufferedReader;
@@ -23,7 +22,7 @@ import java.io.InputStreamReader;
 
 public class ChooseChartOriginActivity extends AppCompatActivity {
     final int PICKFILE_RESULT_CODE = 0;
-    Button btnQR, btnNFC, btnLOCAL, btnConfig;
+    Button btnQR, btnNFC, btnLOCAL, btnConfig, btnDEMOGROUPED;
     TextView siglaNome;
     UserManager userManager;
     IUser user;
@@ -79,6 +78,17 @@ public class ChooseChartOriginActivity extends AppCompatActivity {
             }
         });
 
+        btnDEMOGROUPED = findViewById(R.id.btnDEMOGROUPED);
+        btnDEMOGROUPED.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btnDEMOGROUPED.setEnabled(false);
+                Intent I = new Intent(ChooseChartOriginActivity.this, GroupedBarChartActivity.class);
+                I.putExtra("user", user.getName());
+                startActivity(I);
+            }
+        });
+
         btnNFC = findViewById(R.id.btnNFC);
         btnNFC.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,6 +99,7 @@ public class ChooseChartOriginActivity extends AppCompatActivity {
                 startActivity(I);
             }
         });
+
 
         btnLOCAL = findViewById(R.id.btnLocal);
         btnLOCAL.setOnClickListener(new View.OnClickListener() {
