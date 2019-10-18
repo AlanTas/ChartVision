@@ -16,6 +16,7 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.ColorInt;
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,7 +55,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
 
     TextToSpeech textToSpeech;
     BarChart chart;
-    BarChartObj chartData;
+    GroupedBarChartObj chartData;
     TextView titulo;
     TextView xlabel;
     TextView ylabel;
@@ -92,6 +93,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
     public boolean highContrastEnabled = false;
     public boolean hapticEnabled = true;
     public boolean vibrateToLeave = true;
+    public boolean lerseries = false;
     public FontSize fontSize = FontSize.Small;
 
     UserManager userManager;
@@ -137,6 +139,12 @@ public class GroupedBarChartActivity extends AppCompatActivity {
                     tts("Por favor, desligue o recurso Tólque Béque", false);
                     if(vibrateToLeave){
                         tts("Para sair da visualização do gráfico, sacuda seu aparelho", true);
+                    }
+
+                    tts("Este é um gráfico de barras verticais agrupadas.", false);
+
+                    if(lerseries){
+                       // Ler o prólogo das séries
                     }
                 }
             }
@@ -184,7 +192,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
 
 
 
-        chartData = jsonParser.getBarChartObj();
+        //chartData = jsonParser.getBarChartObj();
         startListeners();
         stpChart(fontSize, highContrastEnabled);
 
@@ -211,15 +219,16 @@ public class GroupedBarChartActivity extends AppCompatActivity {
     public void stpChart(FontSize fontSize, boolean highContrastEnabled){
 
 
-        final List<String> groups = new ArrayList<String>();
+
+        List<String> groups = new ArrayList<String>();
         groups.add("Norte");
         groups.add("Nordeste");
         groups.add("Sul");
 
         List<String> series = new ArrayList<String>();
-        series.add("Ens. Médio");
-        series.add("Ens. Sup");
-        series.add("Pós Grad");
+        series.add("Ensino Médio");
+        series.add("Ensino Superior");
+        series.add("Pós Graduação");
 
 
         List<List> values = new ArrayList<>();
@@ -228,13 +237,18 @@ public class GroupedBarChartActivity extends AppCompatActivity {
         values.add(Arrays.asList(30, 40, 50));
 
 
-        titulo.setText("Número de estudantes por nível escolar em regiões do Brasil");
-        xlabel.setText("Regiões");
-        ylabel.setText("Número de estudantes em milhares");
+        String tituloStr = "Número de estudantes por nível escolar em regiões do Brasil";
+        String xlabelStr = "Regiões";
+        String ylabelStr = "Número de estudantes em milhares";
 
+        chartData = new GroupedBarChartObj(tituloStr, xlabelStr, ylabelStr, series, groups, values);
 
+        titulo.setText(chartData.getTitle());
+        xlabel.setText(chartData.getxLabel());
+        ylabel.setText(chartData.getyLabel());
 
         XAxis xAxis = chart.getXAxis();
+
 
         @ColorInt int colorBackground = Color.parseColor("#000000");
         @ColorInt int colorFont = Color.parseColor("#ffff00");
@@ -248,8 +262,8 @@ public class GroupedBarChartActivity extends AppCompatActivity {
             public String getFormattedValue(float value) {
                 String retorno = "";
 
-                if(value < groups.size() && value >= 0) {
-                    retorno = groups.get((int)value);
+                if(value < chartData.getGroups().size() && value >= 0) {
+                    retorno = chartData.getGroups().get((int)value);
                 }
                 return retorno;
             }
@@ -271,16 +285,16 @@ public class GroupedBarChartActivity extends AppCompatActivity {
         //data
         float groupSpace = 0.15f;
         float barSpace = 0.02f; // x2 dataset
-        float barWidth = (1 - groupSpace - barSpace*series.size()) / series.size();
+        float barWidth = (1 - groupSpace - barSpace*chartData.getSeries().size()) / chartData.getSeries().size();
 
         // (0.46 + 0.02) * 2 + 0.04 = 1.00 -> interval per "group"
 
         List<List> listaSeries = new ArrayList<List>();
 
-        for(int i = 0; i < values.size(); i++){
+        for(int i = 0; i < chartData.getValues().size(); i++){
             List<BarEntry> temp = new ArrayList<BarEntry>();
-            for(int j = 0; j < values.get(i).size(); j++){
-                temp.add(new BarEntry(j, (int)values.get(i).get(j)));
+            for(int j = 0; j < chartData.getValues().get(i).size(); j++){
+                temp.add(new BarEntry(j, (int)chartData.getValues().get(i).get(j)));
             }
             listaSeries.add(temp);
         }
@@ -318,10 +332,10 @@ public class GroupedBarChartActivity extends AppCompatActivity {
         chart.setScaleEnabled(false); // Disable all zooming
         chart.getXAxis().setDrawGridLines(false);
         chart.getDescription().setEnabled(false);
-        chart.getAxisLeft().setDrawGridLines(false);
-        chart.getAxisRight().setDrawGridLines(false);
+        chart.getAxisLeft().setDrawGridLines(true);
+        chart.getAxisRight().setDrawGridLines(true);
         chart.getAxisRight().setEnabled(false);
-        xAxis.setDrawGridLines(false);
+        xAxis.setDrawGridLines(true);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 
 
@@ -432,6 +446,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
 
 
                 if (isInside) {
+                    Toast.makeText(getApplicationContext(), "X: " + h.getX() +". Index: " + h.getDataIndex() + ". Stacked: " + h.getStackIndex(), Toast.LENGTH_LONG).show();
                     lastTitulo = false;
                     lastX = false;
                     lastY = false;
@@ -439,8 +454,15 @@ public class GroupedBarChartActivity extends AppCompatActivity {
 
                     Long entryY = (long) entry.getY();
                     int entryX = (int) entry.getX();
-                    //Toast.makeText(getApplicationContext(), String.valueOf(entryY), Toast.LENGTH_LONG).show();
+
+
                     fitInTemplate(String.valueOf(entryY), FLAG_CHARTVALUE, entryX);
+
+                    Highlight[] highlighs = new Highlight[]{new Highlight(((int) h.getX()) + 0.5f, 0, -1),
+                                                            new Highlight(((int) h.getX()) + 0.5f, 1, -1),
+                                                            new Highlight(((int) h.getX()) + 0.5f, 2, -1)};
+                    chart.highlightValues(highlighs);
+
                 }
 
                 else{
@@ -938,9 +960,43 @@ public class GroupedBarChartActivity extends AppCompatActivity {
                 vibrate(200);
                 break;
             case FLAG_CHARTVALUE:
-                tts("A" + (index + 1) + "ª barra é. " + chartData.getLabels()[index] + " e apresenta valor. " + value, false);
+
                 vibrate(100);
-                //Do this and this:
+
+                if(lerseries) {
+                    String conjunto = "O " + (index + 1) + "o conjunto de barras é... " + chartData.getGroups().get(index) + "!";
+
+                    for (int i = 0; i < chartData.getSeries().size(); i++) {
+
+                        String nomeSerie = chartData.getSeries().get(i);
+                        String valorSerie = chartData.getValues().get(i).get(index).toString();
+                        conjunto += "A série. " + nomeSerie + ". Possui valor. " + valorSerie + ".";
+                    }
+
+
+                    tts(conjunto, true);
+                }
+
+                else {
+
+                    String conjunto = "O " + (index + 1) + "o conjunto de barras é... " + chartData.getGroups().get(index) + "! E possui valores. ";
+                    for (int i = 0; i < chartData.getSeries().size(); i++) {
+
+                        if (i == chartData.getSeries().size() - 1){
+                            conjunto+= " e ";
+                        }
+                        String valorSerie = chartData.getValues().get(i).get(index).toString();
+                        conjunto += valorSerie + ". ";
+
+                    }
+
+
+                    tts(conjunto, true);
+
+                }
+
+
+
                 break;
             default: //For all other cases, do this
                 break;
