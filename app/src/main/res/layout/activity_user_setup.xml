@@ -7,7 +7,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".UserSetupActivity">
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -20,13 +19,14 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+                android:orientation="vertical" >
                 <TextView
                     android:id="@+id/topText"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
                     android:gravity="center_vertical"
                     android:text="ADICIONAR USUÁRIO"
                     android:textColor="#FFFFFF"
@@ -35,9 +35,8 @@
 
                 <EditText
                     android:id="@+id/txtNome"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
@@ -50,6 +49,13 @@
                     tools:backgroundTint="#FFFFFF" />
 
             </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="20dp"
+                android:background="@color/colorSecondary"
+                app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
 
             <Switch
                 android:id="@+id/swcTTS"
@@ -122,6 +128,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
                 android:text="Alto Contraste"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"
@@ -154,6 +161,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
                 app:layout_constraintBottom_toTopOf="@+id/btnSave"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -209,12 +217,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/swcTTS"
                 app:layout_constraintTop_toBottomOf="@+id/swcVibr" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="20dp"
-                android:background="@color/colorSecondary"
-                app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+
         </LinearLayout>
     </ScrollView>
 
@@ -223,8 +226,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:orientation="horizontal"
-        >
+        android:orientation="horizontal">
         <Button
             android:id="@+id/btnSave"
             android:layout_width="0dp"
@@ -239,6 +241,7 @@
             android:id="@+id/btnRemoveUser"
             android:layout_width="0dp"
             android:layout_weight=".5"
+            android:layout_marginLeft="2dp"
             android:layout_height="match_parent"
             android:background="@color/colorSecondary"
             android:text="REMOVER USUÁRIO"
