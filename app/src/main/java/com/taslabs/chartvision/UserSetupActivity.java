@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -31,6 +32,7 @@ public class UserSetupActivity extends AppCompatActivity {
     User newUser;
     IUser oldUser;
     ConstraintLayout constraintLayoutAddUser;
+    LinearLayout linearLayoutAddUser;
     TextView topText;
     Boolean type = false;
     String color = null;
@@ -64,8 +66,8 @@ public class UserSetupActivity extends AppCompatActivity {
         btnRemove = findViewById(R.id.btnRemoveUser);
         topText = findViewById(R.id.topText);
 
-        constraintLayoutAddUser =  findViewById(R.id.constraintAddUser);
-        constraintLayoutAddUser.setBackgroundColor(getResources().getColor(R.color.colorBkg));
+        linearLayoutAddUser =  findViewById(R.id.constraintAddUser);
+        linearLayoutAddUser.setBackgroundColor(getResources().getColor(R.color.colorBkg));
 
         if(type){
             isOldUser();
