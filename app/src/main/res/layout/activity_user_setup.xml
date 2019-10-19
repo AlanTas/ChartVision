@@ -33,6 +33,27 @@
                     android:textSize="24sp"
                     android:textStyle="bold"/>
 
+                <View
+                    android:id="@+id/view"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/colorSecondary"
+                    app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+
+                <TextView
+                    android:id="@+id/topText2"
+                    android:layout_width="match_parent"
+                    android:layout_height="23dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:gravity="center_vertical"
+                    android:text="Nome do Usuário"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
                 <EditText
                     android:id="@+id/txtNome"
                     android:layout_width="match_parent"
@@ -53,7 +74,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="16dp"
                 android:background="@color/colorSecondary"
                 app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
 
@@ -159,7 +180,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 app:layout_constraintBottom_toTopOf="@+id/btnSave"
@@ -183,19 +204,6 @@
                     tools:checked="true" />
 
                 <RadioButton
-                    android:id="@+id/radioG"
-                    android:layout_width="match_parent"
-                    android:layout_height="45dp"
-                    android:layout_gravity="start"
-                    android:buttonTint="@color/colorSecondary"
-                    android:checked="false"
-                    android:layoutDirection="rtl"
-                    android:text="Grande"
-                    android:textAlignment="textStart"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp" />
-
-                <RadioButton
                     android:id="@+id/radioM"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
@@ -204,6 +212,19 @@
                     android:checked="false"
                     android:layoutDirection="rtl"
                     android:text="Média"
+                    android:textAlignment="textStart"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp" />
+
+                <RadioButton
+                    android:id="@+id/radioG"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_gravity="start"
+                    android:buttonTint="@color/colorSecondary"
+                    android:checked="false"
+                    android:layoutDirection="rtl"
+                    android:text="Grande"
                     android:textAlignment="textStart"
                     android:textColor="#FFFFFF"
                     android:textSize="16sp" />
@@ -222,32 +243,31 @@
     </ScrollView>
 
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingBottom="10dp">
+
         <Button
             android:id="@+id/btnSave"
             android:layout_width="0dp"
-            android:layout_weight=".5"
             android:layout_height="match_parent"
+            android:layout_weight=".5"
             android:background="@color/colorSecondary"
             android:text="SALVAR"
-            android:textSize="24sp"
-             />
+            android:textSize="18sp" />
 
         <Button
             android:id="@+id/btnRemoveUser"
             android:layout_width="0dp"
-            android:layout_weight=".5"
-            android:layout_marginLeft="2dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
+            android:layout_weight=".5"
             android:background="@color/colorSecondary"
             android:text="REMOVER USUÁRIO"
-            android:textSize="24sp"
-            android:visibility="invisible"
-             />
+            android:textSize="18sp"
+            android:visibility="invisible" />
     </LinearLayout>
 
 </LinearLayout>

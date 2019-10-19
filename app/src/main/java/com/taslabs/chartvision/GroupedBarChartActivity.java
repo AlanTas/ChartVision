@@ -76,6 +76,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
     boolean first = true;
     boolean isInside = true;
     Highlight lastHighlight;
+    Highlight[] highlitedGroup;
 
     // Flags pro TTS
     public static final int FLAG_TITULO = 0;
@@ -332,10 +333,10 @@ public class GroupedBarChartActivity extends AppCompatActivity {
         chart.setScaleEnabled(false); // Disable all zooming
         chart.getXAxis().setDrawGridLines(false);
         chart.getDescription().setEnabled(false);
-        chart.getAxisLeft().setDrawGridLines(true);
-        chart.getAxisRight().setDrawGridLines(true);
+        chart.getAxisLeft().setDrawGridLines(false);
+        chart.getAxisRight().setDrawGridLines(false);
         chart.getAxisRight().setEnabled(false);
-        xAxis.setDrawGridLines(true);
+        xAxis.setDrawGridLines(false);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 
 
@@ -352,6 +353,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
             chart.getXAxis().setTextSize(10f);
             chart.getAxisLeft().setTextSize(10f);
             chart.getBarData().setValueTextSize(10f);
+            chart.getLegend().setTextSize(10f);
 
 
             chart.setExtraOffsets(left, top, right, bottom);
@@ -367,6 +369,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
             chart.getXAxis().setTextSize(15f);
             chart.getAxisLeft().setTextSize(15f);
             chart.getBarData().setValueTextSize(15f);
+            chart.getLegend().setTextSize(15f);
 
 
             chart.setExtraOffsets(left, top, right, bottom);
@@ -381,6 +384,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
             chart.getXAxis().setTextSize(20f);
             chart.getAxisLeft().setTextSize(20f);
             chart.getBarData().setValueTextSize(20f);
+            chart.getLegend().setTextSize(20f);
 
 
             chart.setExtraOffsets(left, top, right, bottom);
@@ -446,7 +450,6 @@ public class GroupedBarChartActivity extends AppCompatActivity {
 
 
                 if (isInside) {
-                    Toast.makeText(getApplicationContext(), "X: " + h.getX() +". Index: " + h.getDataIndex() + ". Stacked: " + h.getStackIndex(), Toast.LENGTH_LONG).show();
                     lastTitulo = false;
                     lastX = false;
                     lastY = false;
@@ -456,12 +459,21 @@ public class GroupedBarChartActivity extends AppCompatActivity {
                     int entryX = (int) entry.getX();
 
 
-                    fitInTemplate(String.valueOf(entryY), FLAG_CHARTVALUE, entryX);
-
                     Highlight[] highlighs = new Highlight[]{new Highlight(((int) h.getX()) + 0.5f, 0, -1),
                                                             new Highlight(((int) h.getX()) + 0.5f, 1, -1),
                                                             new Highlight(((int) h.getX()) + 0.5f, 2, -1)};
+
+                    if(highlitedGroup == null){
+                        highlitedGroup = highlighs;
+                        fitInTemplate(String.valueOf(entryY), FLAG_CHARTVALUE, entryX);
+                    }
+                    if(!highlitedGroup[0].equalTo(highlighs[0])){
+                        fitInTemplate(String.valueOf(entryY), FLAG_CHARTVALUE, entryX);
+                        highlitedGroup = highlighs;
+                    }
+
                     chart.highlightValues(highlighs);
+
 
                 }
 
@@ -472,6 +484,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected() {
+                highlitedGroup = null;
 
             }
         });
