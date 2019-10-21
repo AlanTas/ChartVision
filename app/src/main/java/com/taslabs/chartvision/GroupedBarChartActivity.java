@@ -123,6 +123,22 @@ public class GroupedBarChartActivity extends AppCompatActivity {
 
         setUserPrefs();
 
+        JsonParser jsonParser = new JsonParser();
+        extras = getIntent().getExtras();
+        if (extras != null) {
+            if (extras.containsKey("url")) {
+                url = extras.getString("url");
+                jsonParser.loadJSONFromURL(url);
+            }
+
+            else if(extras.containsKey("json")){
+                json = extras.getString("json");
+                jsonParser.loadJSONFromJsonString(json);
+            }
+        }
+
+        chartData = jsonParser.getGroupedBarChartObj();
+
         textToSpeech = new TextToSpeech(this, new OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -137,16 +153,48 @@ public class GroupedBarChartActivity extends AppCompatActivity {
                         }
                     }
 
-                    tts("Por favor, desligue o recurso Tólque Béque", false);
+                    String totalRead = "";
+
+                    if(true){
+                        totalRead += "Por favor, desligue o recurso Tólque Béque. ";
+                    }
+
                     if(vibrateToLeave){
-                        tts("Para sair da visualização do gráfico, sacuda seu aparelho", true);
+                        totalRead +="Para sair da visualização do gráfico, sacuda seu aparelho. ";
                     }
 
-                    tts("Este é um gráfico de barras verticais agrupadas.", false);
-
-                    if(lerseries){
-                       // Ler o prólogo das séries
+                    if(ttsEnabled){
+                        totalRead += "Este é um gráfico de barras verticais agrupadas. ";
                     }
+
+                    if(!lerseries){
+                        String read = "O gráfico é composto pelos grupos de barras. ";
+
+                        for (int i = 0; i < chartData.getGroups().size(); i++){
+
+                            if(i == chartData.getGroups().size() - 1){
+                                read += " e ";
+                            }
+                            read += chartData.getGroups().get(i) + ". ";
+                        }
+
+                        read += "Cada grupo contém " + chartData.getSeries().size() + " barras. ";
+
+
+                        for (int i = 0; i < chartData.getSeries().size(); i++){
+
+                            if(i == chartData.getSeries().size() - 1){
+                                read += " e ";
+                            }
+
+                            read += chartData.getSeries().get(i) + ". ";
+                        }
+
+
+                       totalRead += read;
+                    }
+
+                    tts(totalRead, true);
                 }
             }
         });
@@ -177,21 +225,6 @@ public class GroupedBarChartActivity extends AppCompatActivity {
             }
         });
 
-        JsonParser jsonParser = new JsonParser();
-        extras = getIntent().getExtras();
-        if (extras != null) {
-            if (extras.containsKey("url")) {
-                url = extras.getString("url");
-                jsonParser.loadJSONFromURL(url);
-            }
-
-            else if(extras.containsKey("json")){
-                json = extras.getString("json");
-                jsonParser.loadJSONFromJsonString(json);
-            }
-        }
-
-        chartData = jsonParser.getGroupedBarChartObj();
         startListeners();
         stpChart(fontSize, highContrastEnabled);
 
@@ -210,6 +243,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
         highContrastEnabled = user.isHighContrastEnabled();
         hapticEnabled = user.isVibrationEnabled();
         fontSize = user.getFontSize();
+        lerseries = user.isReadSeriesEnabled();
 
 
     }
@@ -336,6 +370,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
         chart.getAxisRight().setEnabled(false);
         xAxis.setDrawGridLines(false);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        chart.getAxisLeft().setAxisMinimum(0f);
 
 
 
@@ -1055,6 +1090,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        textToSpeech.stop();
         if(ttsEnabled) {
             tts("Saindo. Por favor, re-ligue o Tólque Béque", true);
         }

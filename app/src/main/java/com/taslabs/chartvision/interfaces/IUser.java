@@ -36,6 +36,10 @@ public interface IUser {
 
      boolean isShake2LeaveEnabled();
 
+     void setReadSeriesEnabled(boolean enabled);
+
+     boolean isReadSeriesEnabled();
+
      boolean validadeUser();
 
      HashMap<String,String> getUserData();

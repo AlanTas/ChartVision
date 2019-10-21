@@ -137,10 +137,19 @@ public class BarChartActivity extends AppCompatActivity {
                         }
                     }
 
-                    tts("Por favor, desligue o recurso Tólque Béque", false);
-                    if(vibrateToLeave){
-                        tts("Para sair da visualização do gráfico, sacuda seu aparelho", true);
+                    String totalRead = "";
+
+                    if(true){
+                        totalRead += "Por favor, desligue o recurso Tólque Béque. ";
                     }
+
+                    if(vibrateToLeave){
+                        totalRead += "Para sair da visualização do gráfico, sacuda seu aparelho. ";
+                    }
+
+                    totalRead += "Este é um gráfico de barras verticais";
+
+                    tts(totalRead, true);
                 }
             }
         });
@@ -162,7 +171,7 @@ public class BarChartActivity extends AppCompatActivity {
                      * device has been shook.
                      */
                     if(ttsEnabled) {
-                        tts("Saindo. Por favor, re-ligue o Tólque Béque", true);
+                        tts("Saindo. Por favor, re-ligue o Tólque Béque. Este é um gráfico de barras verticais.", true);
                     }
 
                     //textToSpeech.stop();
@@ -217,7 +226,8 @@ public class BarChartActivity extends AppCompatActivity {
 
         @ColorInt int colorBackground = Color.parseColor("#000000");
         @ColorInt int colorFont = Color.parseColor("#ffff00");
-        @ColorInt int colorBars = Color.parseColor("#00ff00");
+        @ColorInt int colorBars = Color.parseColor("#66BB6A");
+        @ColorInt int colorBarsHigh = Color.parseColor("#C8E6C9");
 
         // Carregando dados do gráfico
         titulo.setText(chartData.getTitle());
@@ -236,6 +246,7 @@ public class BarChartActivity extends AppCompatActivity {
         BarDataSet set = new BarDataSet(entries, "BarDataSet");
         if(this.highContrastEnabled){
             set.setColor(colorBars);
+            set.setHighLightColor(colorBarsHigh);
         }
         BarData data = new BarData(set);
         chart.setData(data);
@@ -258,6 +269,7 @@ public class BarChartActivity extends AppCompatActivity {
         xAxis.setLabelCount(lenght);
         xAxis.setDrawGridLines(false);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        chart.getAxisLeft().setAxisMinimum(0f);
 
 
 
@@ -873,7 +885,7 @@ public class BarChartActivity extends AppCompatActivity {
                 vibrate(200);
                 break;
             case FLAG_CHARTVALUE:
-                tts("A" + (index + 1) + "ª barra é. " + chartData.getLabels()[index] + " e apresenta valor. " + value, false);
+                tts("A" + (index + 1) + "ª barra é. " + chartData.getLabels()[index] + " e apresenta valor. " + chartData.getValues()[index], false);
                 vibrate(100);
                 //Do this and this:
                 break;

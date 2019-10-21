@@ -25,7 +25,7 @@ import java.io.InputStreamReader;
 
 public class ChooseChartOriginActivity extends AppCompatActivity {
     final int PICKFILE_RESULT_CODE = 0;
-    Button btnQR, btnNFC, btnLOCAL, btnConfig, btnDEMOGROUPED;
+    Button btnQR, btnNFC, btnLOCAL, btnConfig;
     TextView siglaNome;
     UserManager userManager;
     IUser user;
@@ -76,17 +76,6 @@ public class ChooseChartOriginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 btnQR.setEnabled(false);
                 Intent I = new Intent(ChooseChartOriginActivity.this, QRScanActivity.class);
-                I.putExtra("user", user.getName());
-                startActivity(I);
-            }
-        });
-
-        btnDEMOGROUPED = findViewById(R.id.btnDEMOGROUPED);
-        btnDEMOGROUPED.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                btnDEMOGROUPED.setEnabled(false);
-                Intent I = new Intent(ChooseChartOriginActivity.this, GroupedBarChartActivity.class);
                 I.putExtra("user", user.getName());
                 startActivity(I);
             }

@@ -14,6 +14,7 @@ public class User implements IUser {
     private boolean mVibrationEnabled;
     private boolean mHighContrastEnabled;
     private boolean mShake2LeaveEnabled;
+    private boolean mReadSeriesEnabled;
 
     public final String KEY_NAME = "user_name";
     public final String KEY_FONT_SIZE = "user_font_size";
@@ -21,6 +22,7 @@ public class User implements IUser {
     public final String KEY_VIBRATION = "user_vibration";
     public final String KEY_CONTRAST = "user_contrast";
     public final String KEY_SHAKE2LEAVE = "user_shake";
+    public final String KEY_READSERIES = "user_read_series";
 
 
     @Override
@@ -90,6 +92,17 @@ public class User implements IUser {
     }
 
     @Override
+    public void setReadSeriesEnabled(boolean enabled){
+        mReadSeriesEnabled = enabled;
+    }
+
+    @Override
+    public boolean isReadSeriesEnabled() {
+        return mReadSeriesEnabled;
+    }
+
+
+    @Override
     public HashMap<String, String> getUserData() {
         HashMap<String,String> dados = new HashMap<>();
         dados.put(KEY_FONT_SIZE,getFontSize().toString());
@@ -97,6 +110,7 @@ public class User implements IUser {
         dados.put(KEY_VIBRATION, String.valueOf(isVibrationEnabled()));
         dados.put(KEY_CONTRAST, String.valueOf(isHighContrastEnabled()));
         dados.put(KEY_SHAKE2LEAVE, String.valueOf(isShake2LeaveEnabled()));
+        dados.put(KEY_READSERIES, String.valueOf(isReadSeriesEnabled()));
         return dados;
     }
 }

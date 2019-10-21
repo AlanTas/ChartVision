@@ -56,6 +56,8 @@ public class UserManager implements IUserManager {
        user.setVibrationEnabled(Boolean.parseBoolean(mSharedPref.getString(name + user.KEY_VIBRATION,"true")));
        user.setHighContrastEnabled(Boolean.parseBoolean(mSharedPref.getString(name + user.KEY_CONTRAST,"false")));
        user.setShake2LeaveEnabled(Boolean.parseBoolean(mSharedPref.getString(name + user.KEY_SHAKE2LEAVE,"true")));
+       user.setReadSeriesEnabled(Boolean.parseBoolean(mSharedPref.getString(name + user.KEY_READSERIES,"true")));
+       printWholeSharedPrefs();
        return user;
     }
 
