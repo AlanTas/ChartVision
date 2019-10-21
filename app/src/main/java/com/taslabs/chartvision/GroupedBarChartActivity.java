@@ -191,9 +191,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
             }
         }
 
-
-
-        //chartData = jsonParser.getBarChartObj();
+        chartData = jsonParser.getGroupedBarChartObj();
         startListeners();
         stpChart(fontSize, highContrastEnabled);
 
@@ -220,29 +218,29 @@ public class GroupedBarChartActivity extends AppCompatActivity {
     public void stpChart(FontSize fontSize, boolean highContrastEnabled){
 
 
-
-        List<String> groups = new ArrayList<String>();
-        groups.add("Norte");
-        groups.add("Nordeste");
-        groups.add("Sul");
-
-        List<String> series = new ArrayList<String>();
-        series.add("Ensino Médio");
-        series.add("Ensino Superior");
-        series.add("Pós Graduação");
-
-
-        List<List> values = new ArrayList<>();
-        values.add(Arrays.asList(450, 324, 213));
-        values.add(Arrays.asList(102, 87, 78));
-        values.add(Arrays.asList(30, 40, 50));
-
-
-        String tituloStr = "Número de estudantes por nível escolar em regiões do Brasil";
-        String xlabelStr = "Regiões";
-        String ylabelStr = "Número de estudantes em milhares";
-
-        chartData = new GroupedBarChartObj(tituloStr, xlabelStr, ylabelStr, series, groups, values);
+//
+//        List<String> groups = new ArrayList<String>();
+//        groups.add("Norte");
+//        groups.add("Nordeste");
+//        groups.add("Sul");
+//
+//        List<String> series = new ArrayList<String>();
+//        series.add("Ensino Médio");
+//        series.add("Ensino Superior");
+//        series.add("Pós Graduação");
+//
+//
+//        List<List> values = new ArrayList<>();
+//        values.add(Arrays.asList(450, 324, 213));
+//        values.add(Arrays.asList(102, 87, 78));
+//        values.add(Arrays.asList(30, 40, 50));
+//
+//
+//        String tituloStr = "Número de estudantes por nível escolar em regiões do Brasil";
+//        String xlabelStr = "Regiões";
+//        String ylabelStr = "Número de estudantes em milhares";
+//
+//        //chartData = new GroupedBarChartObj(tituloStr, xlabelStr, ylabelStr, series, groups, values);
 
         titulo.setText(chartData.getTitle());
         xlabel.setText(chartData.getxLabel());
@@ -295,7 +293,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
         for(int i = 0; i < chartData.getValues().size(); i++){
             List<BarEntry> temp = new ArrayList<BarEntry>();
             for(int j = 0; j < chartData.getValues().get(i).size(); j++){
-                temp.add(new BarEntry(j, (int)chartData.getValues().get(i).get(j)));
+                temp.add(new BarEntry(j, (float) chartData.getValues().get(i).get(j)));
             }
             listaSeries.add(temp);
         }
@@ -304,8 +302,9 @@ public class GroupedBarChartActivity extends AppCompatActivity {
         ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
         for(int i = 0; i < listaSeries.size(); i++){
 
-            BarDataSet set = new BarDataSet(listaSeries.get(i), series.get(i));
-            set.setColor(Color.rgb(rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)));
+            BarDataSet set = new BarDataSet(listaSeries.get(i), chartData.getSeries().get(i));
+            set.setColor(getColors(i).get(0));
+            set.setHighLightColor(getColors(i).get(1));
             dataSets.add(set);
 
         }
@@ -316,8 +315,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
 
         chart.getBarData().setBarWidth(barWidth);
         chart.getXAxis().setAxisMinValue(0);
-        chart.getXAxis().setAxisMaximum(groups.size());
-        chart.getLegend().setTextColor(Color.parseColor("#FFFFFF"));
+        chart.getXAxis().setAxisMaximum(chartData.getGroups().size());
         chart.groupBars(0, groupSpace, barSpace);
         chart.invalidate();
 
@@ -396,6 +394,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
             chart.getXAxis().setTextColor(colorFont);
             chart.getAxisLeft().setTextColor(colorFont);
             chart.getBarData().setValueTextColor(colorFont);
+            chart.getLegend().setTextColor(Color.parseColor("#FFFFFF"));
 
             chart.getXAxis().setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
             chart.getAxisLeft().setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
@@ -1061,6 +1060,28 @@ public class GroupedBarChartActivity extends AppCompatActivity {
         }
 
         super.onBackPressed();
+
+    }
+
+    public List<Integer> getColors(int i){
+
+        List<Integer> cores = new ArrayList<>();
+
+        String[] CoresEscuras = new String[]{"#FF7043", "#42A5F5", "#66BB6A", "#FFEE58", "#26C6DA"};
+        String[] CoresClaras = new String[]{"#FFCCBC", "#BBDEFB", "#C8E6C9", "#FFF9C4", "#B2EBF2"};
+
+        if(i < CoresClaras.length){
+
+            cores.add(Color.parseColor(CoresEscuras[i]));
+            cores.add(Color.parseColor(CoresClaras[i]));
+        }
+
+        else{
+            cores.add(Color.parseColor(CoresEscuras[rnd.nextInt(CoresEscuras.length)]));
+            cores.add(Color.parseColor(CoresClaras[rnd.nextInt(CoresClaras.length)]));
+        }
+
+        return cores;
 
     }
 

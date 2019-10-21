@@ -18,7 +18,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -27,6 +29,7 @@ public class JsonParser {
 
     public JSONObject obj;
     public BarChartObj barChartObj;
+    public GroupedBarChartObj groupedBarChartObj;
 
 
 
@@ -62,6 +65,7 @@ public class JsonParser {
     }
 
     public void loadJSONFromJsonString(String json) {
+        JSONObject encoding = null;
 
         try {
             obj = new JSONObject(json);
@@ -69,13 +73,24 @@ public class JsonParser {
             e.printStackTrace();
         }
 
-        getDataFromJson(obj);
+        try {
+            encoding = obj.getJSONObject("encoding");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if (encoding.has("column")){
+            getGroupedDataFromJson(obj);
+        }
+        else {
+            getDataFromJson(obj);
+        }
 
     }
 
 
     public String loadJSONFromURL(String url) {
-
+        JSONObject encoding = null;
         try {
             MyTask task = new MyTask();
             String objeto =  task.execute(url).get();
@@ -86,7 +101,18 @@ public class JsonParser {
                 e.printStackTrace();
             }
 
-            getDataFromJson(obj);
+            try {
+                encoding = obj.getJSONObject("encoding");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            if (encoding.has("column")){
+                getGroupedDataFromJson(obj);
+            }
+            else {
+                getDataFromJson(obj);
+            }
 
 
         } catch (ExecutionException e) {
@@ -105,6 +131,7 @@ public class JsonParser {
         String yLabelS = null;
         String[] labelsS = null;
         double[] valuesS = null;
+
 
         // Get Title
 
@@ -147,8 +174,157 @@ public class JsonParser {
         return barChartObj;
     }
 
+    public GroupedBarChartObj getGroupedDataFromJson(JSONObject json){
+
+        String TitleS = null;
+        String xLabelS = null;
+        String yLabelS = null;
+        List<String> groups = new ArrayList<String>();
+        List<String> series = new ArrayList<String>();
+        List<List> values = new ArrayList<>();
+
+
+
+        // Get Title
+
+        try {
+            TitleS = String.valueOf(json.get("title"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Get Axis Labels
+        String fieldGroups = "";
+        String fieldSeries = "";
+        String fieldValues = "";
+
+        try {
+            JSONObject encoding = json.getJSONObject("encoding");
+            xLabelS = String.valueOf(encoding.getJSONObject("x").getJSONObject("axis").get("title"));
+            yLabelS = String.valueOf(encoding.getJSONObject("y").getJSONObject("axis").get("title"));
+            fieldGroups = String.valueOf(encoding.getJSONObject("column").get("field"));
+            fieldSeries = String.valueOf(encoding.getJSONObject("x").get("field"));
+            fieldValues = String.valueOf(encoding.getJSONObject("y").get("field"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Titulo: " + TitleS);
+        System.out.println("X Label: " + xLabelS);
+        System.out.println("Y Label: " + yLabelS);
+        System.out.println("Field Groups: " + fieldGroups);
+        System.out.println("Field Series: " + fieldSeries);
+        System.out.println("Field Values: " + fieldValues);
+
+
+
+
+
+        try {
+            // Get Groups
+            JSONArray valuesKey = json.getJSONObject("data").getJSONArray("values");
+
+            for (int i = 0; i < valuesKey.length(); i++){
+                JSONObject each = valuesKey.getJSONObject(i);
+                String currentGroup = each.getString(fieldGroups);
+                String currentSerie = each.getString(fieldSeries);
+                if (!groups.contains(currentGroup)) {
+                    groups.add(currentGroup);
+                }
+
+                if (!series.contains(currentSerie)) {
+                    series.add(currentSerie);
+                }
+            }
+
+            System.out.println("SIZE GROUPS: " +groups.size());
+            System.out.println("SIZE SERIES: " +series.size());
+
+            // Get Values
+            for(int i = 0; i < series.size(); i++){
+                String serieAtual = series.get(i);
+
+                List<Float> currentSerie = new ArrayList<>();
+
+                for(int j = 0; j < groups.size(); j++){
+                    String grupoAtual = groups.get(j);
+                    System.out.println(serieAtual + " " + grupoAtual);
+
+                    for (int k = 0; k < valuesKey.length(); k++){
+                        JSONObject each = valuesKey.getJSONObject(k);
+
+                        if(each.getString(fieldSeries).equals(serieAtual) && each.getString(fieldGroups).equals(grupoAtual)) {
+                            System.out.println(each.toString());
+                            currentSerie.add(Float.valueOf(each.getString(fieldValues)));
+                        }
+
+
+                    }
+                }
+                values.add(currentSerie);
+            }
+
+            System.out.println("Values: " + values.toString());
+
+            System.out.println("GROUPS: ");
+            for( int i = 0 ; i < groups.size(); i++){
+                System.out.println(groups.get(i));
+            }
+
+            System.out.println("SERIES: ");
+            for( int i = 0 ; i < series.size(); i++){
+                System.out.println(series.get(i));
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        groupedBarChartObj = new GroupedBarChartObj(TitleS, xLabelS, yLabelS, series, groups, values);
+
+        return groupedBarChartObj;
+    }
+
     public BarChartObj getBarChartObj() {
         return barChartObj;
+    }
+
+    public GroupedBarChartObj getGroupedBarChartObj() {
+        return groupedBarChartObj;
+    }
+
+    public boolean isGrouped(String url){
+        JSONObject encoding = null;
+        boolean isGrouped = false;
+
+        try {
+            MyTask task = new MyTask();
+            String objeto =  task.execute(url).get();
+
+            try {
+                obj = new JSONObject(objeto);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                encoding = obj.getJSONObject("encoding");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            if (encoding.has("column")){
+                isGrouped = true;
+            }
+
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+       return isGrouped;
     }
 }
 

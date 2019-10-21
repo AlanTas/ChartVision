@@ -10,6 +10,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -62,13 +65,39 @@ public class LocalFileActivity extends AppCompatActivity {
                             sb.append(line + "\n");
                         }
                         br.close();
-                        System.out.println("OUTPUT");
-                        System.out.println(sb.toString());
+//                        System.out.println("OUTPUT");
+//                        System.out.println(sb.toString());
 
                         String intentData = sb.toString();
-                        Intent i = new Intent(LocalFileActivity.this, BarChartActivity.class);
-                        i.putExtra("json", intentData);
-                        startActivity(i);
+
+                        JSONObject encoding = null;
+                        JSONObject obj = null;
+                        try {
+                            obj = new JSONObject(intentData);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        try {
+                            encoding = obj.getJSONObject("encoding");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        System.out.println("AQUIAQUIAQUIAQUIAQUIAQUIAQUI");
+
+                        if (encoding.has("column")){
+                            Intent i = new Intent(LocalFileActivity.this, GroupedBarChartActivity.class);
+                            i.putExtra("json", intentData);
+                            startActivity(i);
+                        }
+                        else {
+                            Intent i = new Intent(LocalFileActivity.this, BarChartActivity.class);
+                            i.putExtra("json", intentData);
+                            startActivity(i);
+                        }
+
 
 
                     } catch (FileNotFoundException e) {

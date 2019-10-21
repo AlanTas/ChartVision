@@ -39,6 +39,7 @@ public class NFCActivity extends AppCompatActivity {
 
     UserManager userManager;
     IUser user;
+    JsonParser jsonParser = new JsonParser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -305,11 +306,23 @@ public class NFCActivity extends AppCompatActivity {
 
         tts("Tég detectada!");
         vibrate(100);
-        Intent i = new Intent(NFCActivity.this, BarChartActivity.class);
-        i.putExtra("url", intentData);
-        i.putExtra("user", user.getName());
-        startActivity(i);
-        finish();
+
+
+        if (jsonParser.isGrouped(intentData)) {
+            Intent i = new Intent(NFCActivity.this, GroupedBarChartActivity.class);
+            i.putExtra("url", intentData);
+            i.putExtra("user", user.getName());
+            startActivity(i);
+            finish();
+        }
+
+        else {
+            Intent i = new Intent(NFCActivity.this, BarChartActivity.class);
+            i.putExtra("url", intentData);
+            i.putExtra("user", user.getName());
+            startActivity(i);
+            finish();
+        }
     }
 
 }

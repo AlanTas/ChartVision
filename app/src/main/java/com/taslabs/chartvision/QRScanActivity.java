@@ -46,6 +46,7 @@ public class QRScanActivity extends AppCompatActivity {
     private static final int REQUEST_CAMERA_PERMISSION = 201;
     String intentData = "";
     TextToSpeech textToSpeech;
+    JsonParser jsonParser = new JsonParser();
 
     //SHAKE VARIABLES
     private SensorManager mSensorManager;
@@ -141,11 +142,21 @@ public class QRScanActivity extends AppCompatActivity {
                     System.out.println(intentData);
 
                     vibrate(100);
-                    Intent i = new Intent(QRScanActivity.this, BarChartActivity.class);
-                    i.putExtra("url", intentData);
-                    i.putExtra("user", user.getName());
-                    startActivity(i);
-                    finish();
+                    if(jsonParser.isGrouped(intentData)){
+                        Intent i = new Intent(QRScanActivity.this, GroupedBarChartActivity.class);
+                        i.putExtra("url", intentData);
+                        i.putExtra("user", user.getName());
+                        startActivity(i);
+                        finish();
+                    }
+
+                    else {
+                        Intent i = new Intent(QRScanActivity.this, BarChartActivity.class);
+                        i.putExtra("url", intentData);
+                        i.putExtra("user", user.getName());
+                        startActivity(i);
+                        finish();
+                    }
                 }
             }
         });

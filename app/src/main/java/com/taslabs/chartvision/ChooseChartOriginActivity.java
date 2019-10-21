@@ -14,6 +14,9 @@ import com.github.mikephil.charting.charts.BarChart;
 import com.taslabs.chartvision.interfaces.IUser;
 import com.taslabs.chartvision.userManager.UserManager;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -145,10 +148,35 @@ public class ChooseChartOriginActivity extends AppCompatActivity {
                     System.out.println(sb.toString());
 
                     String intentData = sb.toString();
-                    Intent i = new Intent(ChooseChartOriginActivity.this, BarChartActivity.class);
-                    i.putExtra("user", user.getName());
-                    i.putExtra("json", intentData);
-                    startActivity(i);
+
+
+                    JSONObject encoding = null;
+                    JSONObject obj = null;
+                    try {
+                        obj = new JSONObject(intentData);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        encoding = obj.getJSONObject("encoding");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (encoding.has("column")){
+                        Intent i = new Intent(ChooseChartOriginActivity.this, GroupedBarChartActivity.class);
+                        i.putExtra("json", intentData);
+                        i.putExtra("user", user.getName());
+                        startActivity(i);
+                    }
+                    else {
+                        Intent i = new Intent(ChooseChartOriginActivity.this, BarChartActivity.class);
+                        i.putExtra("json", intentData);
+                        i.putExtra("user", user.getName());
+                        startActivity(i);
+                    }
 
 
                 } catch (FileNotFoundException e) {
