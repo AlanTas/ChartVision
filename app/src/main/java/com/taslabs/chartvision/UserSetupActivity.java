@@ -25,7 +25,7 @@ import java.util.List;
 public class UserSetupActivity extends AppCompatActivity {
 
     UserManager userManager;
-    Switch swcContrast, swcVibra, swcTTS, swcShake, swcSeries;
+    Switch swcContrast, swcVibra, swcTTS, swcShake;
     RadioButton radioP, radioM, radioG;
     EditText txtNome;
     Button btnSave, btnRemove;
@@ -65,7 +65,6 @@ public class UserSetupActivity extends AppCompatActivity {
         radioG = findViewById(R.id.radioG);
         btnRemove = findViewById(R.id.btnRemoveUser);
         topText = findViewById(R.id.topText);
-        swcSeries = findViewById(R.id.swcSeries);
 
         linearLayoutAddUser =  findViewById(R.id.constraintAddUser);
         linearLayoutAddUser.setBackgroundColor(getResources().getColor(R.color.colorBkg));
@@ -103,7 +102,6 @@ public class UserSetupActivity extends AppCompatActivity {
     public void isNewUser(){
 
         swcTTS.setChecked(true);
-        swcSeries.setChecked(true);
         radioP.setChecked(true);
 
         btnSave.setOnClickListener(new View.OnClickListener() {
@@ -119,7 +117,7 @@ public class UserSetupActivity extends AppCompatActivity {
                     newUser.setVibrationEnabled(swcVibra.isChecked());
                     newUser.setHighContrastEnabled(swcContrast.isChecked());
                     newUser.setShake2LeaveEnabled(swcShake.isChecked());
-                    newUser.setReadSeriesEnabled(swcSeries.isChecked());
+                    newUser.setReadSeriesEnabled(true);
                     boolean success = userManager.SaveUser(newUser);
                     if(success) {
                         finish();
@@ -161,10 +159,6 @@ public class UserSetupActivity extends AppCompatActivity {
             swcShake.setChecked(true);
         }
 
-        if(oldUser.isReadSeriesEnabled()){
-            swcSeries.setChecked(true);
-        }
-
         if(oldUser.getFontSize() == FontSize.Small){
             radioP.setChecked(true);
         }
@@ -197,7 +191,7 @@ public class UserSetupActivity extends AppCompatActivity {
                     newUser.setVibrationEnabled(swcVibra.isChecked());
                     newUser.setHighContrastEnabled(swcContrast.isChecked());
                     newUser.setShake2LeaveEnabled(swcShake.isChecked());
-                    newUser.setReadSeriesEnabled(swcSeries.isChecked());
+                    newUser.setReadSeriesEnabled(true);
                     boolean success = userManager.EditUser(oldUser, newUser);
                     if(success) {
                         Intent I = new Intent(UserSetupActivity.this, ChooseChartOriginActivity.class);

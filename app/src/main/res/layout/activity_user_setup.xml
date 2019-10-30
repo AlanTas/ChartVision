@@ -45,7 +45,7 @@
                 <TextView
                     android:id="@+id/topText2"
                     android:layout_width="match_parent"
-                    android:layout_height="23dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
@@ -165,30 +165,10 @@
                 app:layout_constraintBottom_toTopOf="@+id/swcTTS"
                 app:layout_constraintTop_toBottomOf="@+id/swcVibr" />
 
-            <Switch
-                android:id="@+id/swcSeries"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
-                android:text="Ler Séries"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/colorSecondary"
-                app:layout_constraintBottom_toTopOf="@+id/swcTTS"
-                app:layout_constraintTop_toBottomOf="@+id/swcVibr" />
-
             <TextView
                 android:id="@+id/textView2"
                 android:layout_width="match_parent"
-                android:layout_height="23dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"

@@ -27,7 +27,7 @@
         android:layout_width="199dp"
         android:layout_height="218dp"
         android:gravity="center_horizontal|top"
-        android:paddingTop="28sp"
+        android:paddingTop="18sp"
         android:rotation="-90"
         android:text="Text big enough to try to fill "
         app:layout_constraintBottom_toBottomOf="parent"

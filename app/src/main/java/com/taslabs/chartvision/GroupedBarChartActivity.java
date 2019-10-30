@@ -243,7 +243,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
         highContrastEnabled = user.isHighContrastEnabled();
         hapticEnabled = user.isVibrationEnabled();
         fontSize = user.getFontSize();
-        lerseries = user.isReadSeriesEnabled();
+        lerseries = true;
 
 
     }
@@ -1016,12 +1016,22 @@ public class GroupedBarChartActivity extends AppCompatActivity {
                     for (int i = 0; i < chartData.getSeries().size(); i++) {
 
                         String nomeSerie = chartData.getSeries().get(i);
-                        String valorSerie = chartData.getValues().get(i).get(index).toString();
+                        float x = (float) chartData.getValues().get(i).get(index);
+                        String valorSerie = "";
+                        if(x == (float) Math.ceil(x)){
+                            valorSerie = String.valueOf(Math.round(x));
+                        }
+
+                        else{
+                            valorSerie = chartData.getValues().get(i).get(index).toString();
+                        }
+
+
                         conjunto += "A série. " + nomeSerie + ". Possui valor. " + valorSerie + ".";
                     }
 
 
-                    tts(conjunto, true);
+                    tts(conjunto, false);
                 }
 
                 else {
@@ -1038,7 +1048,7 @@ public class GroupedBarChartActivity extends AppCompatActivity {
                     }
 
 
-                    tts(conjunto, true);
+                    tts(conjunto, false);
 
                 }
 
